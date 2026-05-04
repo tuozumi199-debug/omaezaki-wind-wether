@@ -2,12 +2,14 @@ const LAT = 34.647;
 const LON = 138.126;
 const PLACE = "御前崎・池新田";
 
-// 運用しながら調整する値
-const LOOKAHEAD_HOURS = 6;      // 何時間先まで見て警告するか
-const MORNING_HOUR = 8;         // 「翌朝」を何時までにするか
-const WARNING_GUST = 15;        // 突風 m/s：警戒
+// ===== 通知設定 =====
+const LOOKAHEAD_HOURS = 6;      // 通常チェックで何時間先まで見るか
+const MORNING_HOUR = 8;         // 16時レポートで「翌朝」を何時までにするか
+
+// ===== 閾値設定 =====
+const WARNING_GUST = 15;        // 突風 m/s：強風警戒
 const STOP_GUST = 20;           // 突風 m/s：停止推奨
-const WARNING_WIND = 10;        // 平均風速 m/s：警戒
+const WARNING_WIND = 10;        // 平均風速 m/s：強風警戒
 const STOP_WIND = 14;           // 平均風速 m/s：停止推奨
 
 const mode = process.argv[2] || "check";
@@ -18,21 +20,37 @@ if (!webhookUrl) {
   process.exit(1);
 }
 
+function pad(n) {
+  return String(n).padStart(2, "0");
+}
+
 function fmt(value, digits = 1) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
   return Number(value).toFixed(digits);
 }
 
-function nowJstIsoMinute() {
-  return new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16);
+function nowJstFakeDate() {
+  return new Date(Date.now() + 9 * 60 * 60 * 1000);
 }
 
-function jstIsoAfterHours(hours) {
-  return new Date(Date.now() + (9 + hours) * 60 * 60 * 1000).toISOString().slice(0, 16);
+function nowJstIsoMinute() {
+  return nowJstFakeDate().toISOString().slice(0, 16);
+}
+
+function currentJstFloorHourIso() {
+  const d = nowJstFakeDate();
+  d.setUTCMinutes(0, 0, 0);
+  return d.toISOString().slice(0, 16);
+}
+
+function jstIsoAfterHoursFrom(startIso, hours) {
+  const d = new Date(`${startIso}:00Z`);
+  d.setUTCHours(d.getUTCHours() + hours);
+  return d.toISOString().slice(0, 16);
 }
 
 function todayJstDate() {
-  return nowJstIsoMinute().slice(0, 10);
+  return nowJstFakeDate().toISOString().slice(0, 10);
 }
 
 function addDaysToDateString(yyyyMMdd, days) {
@@ -44,31 +62,56 @@ function addDaysToDateString(yyyyMMdd, days) {
 function displayTime(iso) {
   if (!iso) return "--";
   const [date, time] = iso.split("T");
-  const [y, m, d] = date.split("-");
+  const [, m, d] = date.split("-");
   return `${Number(m)}/${Number(d)} ${time}`;
 }
 
 function degToDir(deg) {
   if (deg === null || deg === undefined) return "--";
+
   const dirs = [
     "北", "北北東", "北東", "東北東",
     "東", "東南東", "南東", "南南東",
     "南", "南南西", "南西", "西南西",
     "西", "西北西", "北西", "北北西"
   ];
+
   return dirs[Math.round(Number(deg) / 22.5) % 16];
 }
 
 function weatherText(code) {
   const map = {
-    0: "快晴", 1: "晴れ", 2: "一部曇り", 3: "曇り",
-    45: "霧", 48: "霧氷",
-    51: "弱い霧雨", 53: "霧雨", 55: "強い霧雨",
-    61: "弱い雨", 63: "雨", 65: "強い雨",
-    80: "弱いにわか雨", 81: "にわか雨", 82: "強いにわか雨",
-    95: "雷雨", 96: "雷雨・弱い雹", 99: "雷雨・強い雹"
+    0: "快晴",
+    1: "晴れ",
+    2: "一部曇り",
+    3: "曇り",
+    45: "霧",
+    48: "霧氷",
+    51: "弱い霧雨",
+    53: "霧雨",
+    55: "強い霧雨",
+    56: "弱い凍る霧雨",
+    57: "強い凍る霧雨",
+    61: "弱い雨",
+    63: "雨",
+    65: "強い雨",
+    66: "弱い凍雨",
+    67: "強い凍雨",
+    71: "弱い雪",
+    73: "雪",
+    75: "強い雪",
+    77: "雪粒",
+    80: "弱いにわか雨",
+    81: "にわか雨",
+    82: "強いにわか雨",
+    85: "弱いにわか雪",
+    86: "強いにわか雪",
+    95: "雷雨",
+    96: "雷雨・弱い雹",
+    99: "雷雨・強い雹"
   };
-  return map[code] || "天気コード " + code;
+
+  return map[code] || `天気コード ${code}`;
 }
 
 function weatherIcon(code) {
@@ -76,25 +119,44 @@ function weatherIcon(code) {
   if ([1, 2].includes(code)) return "🌤️";
   if (code === 3) return "☁️";
   if ([45, 48].includes(code)) return "🌫️";
-  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return "🌧️";
+  if ([51, 53, 55, 56, 57].includes(code)) return "🌦️";
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "🌧️";
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return "❄️";
   if ([95, 96, 99].includes(code)) return "⛈️";
   return "🌡️";
 }
 
 function maxOf(items, field) {
   let best = null;
+
   for (const item of items) {
     const value = item[field];
-    if (value === null || value === undefined || Number.isNaN(Number(value))) continue;
-    if (!best || Number(value) > Number(best[field])) best = item;
+
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
+      continue;
+    }
+
+    if (!best || Number(value) > Number(best[field])) {
+      best = item;
+    }
   }
+
   return best;
 }
 
 function riskLabel(maxGust, maxWind) {
-  if (maxGust >= STOP_GUST || maxWind >= STOP_WIND) return "🟣 停止推奨";
-  if (maxGust >= WARNING_GUST || maxWind >= WARNING_WIND) return "🔴 強風警戒";
-  if (maxGust >= 10 || maxWind >= 7) return "🟡 風に注意";
+  if (maxGust >= STOP_GUST || maxWind >= STOP_WIND) {
+    return "🟣 停止推奨";
+  }
+
+  if (maxGust >= WARNING_GUST || maxWind >= WARNING_WIND) {
+    return "🔴 強風警戒";
+  }
+
+  if (maxGust >= 10 || maxWind >= 7) {
+    return "🟡 風に注意";
+  }
+
   return "🟢 通常";
 }
 
@@ -109,7 +171,11 @@ async function fetchWeather() {
     "&forecast_days=3";
 
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Open-Meteo API error: ${res.status}`);
+
+  if (!res.ok) {
+    throw new Error(`Open-Meteo API error: ${res.status}`);
+  }
+
   return res.json();
 }
 
@@ -119,6 +185,7 @@ function buildHourlyItems(data, startIso, endIso) {
 
   for (let i = 0; i < h.time.length; i++) {
     const time = h.time[i];
+
     if (time >= startIso && time <= endIso) {
       items.push({
         time,
@@ -132,6 +199,7 @@ function buildHourlyItems(data, startIso, endIso) {
       });
     }
   }
+
   return items;
 }
 
@@ -146,18 +214,34 @@ function summarize(items) {
     peakWind,
     peakRainProb,
     peakTemp,
-    label: riskLabel(Number(peakGust?.gust ?? 0), Number(peakWind?.wind ?? 0))
+    label: riskLabel(
+      Number(peakGust?.gust ?? 0),
+      Number(peakWind?.wind ?? 0)
+    )
   };
 }
 
-function buildMessage({ title, startIso, endIso, items, force }) {
+function buildHourlyList(items) {
+  return items.map(item => {
+    return `${displayTime(item.time)} ${weatherIcon(item.code)} ${weatherText(item.code)}｜気${fmt(item.temp)}℃｜降${fmt(item.rainProb, 0)}%｜風${fmt(item.wind)}/突${fmt(item.gust)}m/s｜${degToDir(item.dir)}`;
+  });
+}
+
+function buildMessage({
+  title,
+  startIso,
+  endIso,
+  items,
+  force,
+  includeHourlyList = false
+}) {
   const s = summarize(items);
   const peak = s.peakGust || s.peakWind || items[0];
   const code = peak?.code;
   const icon = weatherIcon(code);
   const text = weatherText(code);
 
-  return [
+  const lines = [
     `${title}`,
     `地点：${PLACE}`,
     `対象：${displayTime(startIso)} 〜 ${displayTime(endIso)}`,
@@ -169,31 +253,71 @@ function buildMessage({ title, startIso, endIso, items, force }) {
     `ピーク時の天気：${icon} ${text}`,
     `取得：${displayTime(nowJstIsoMinute())}`,
     force ? "" : "※閾値を超えたため通知しました。"
-  ].filter(Boolean).join("\n");
+  ].filter(Boolean);
+
+  if (includeHourlyList) {
+    lines.push("");
+    lines.push("【時間別一覧】");
+    lines.push("時刻 天気｜気温｜降水｜風速/突風｜風向");
+    lines.push(...buildHourlyList(items));
+  }
+
+  return lines.join("\n");
+}
+
+function splitDiscordContent(content, limit = 1800) {
+  if (content.length <= limit) return [content];
+
+  const chunks = [];
+  const lines = content.split("\n");
+  let current = "";
+
+  for (const line of lines) {
+    const next = current ? `${current}\n${line}` : line;
+
+    if (next.length > limit) {
+      if (current) chunks.push(current);
+      current = line;
+    } else {
+      current = next;
+    }
+  }
+
+  if (current) chunks.push(current);
+  return chunks;
 }
 
 async function postDiscord(content) {
-  const url = new URL(webhookUrl);
-  url.searchParams.set("wait", "true");
+  const chunks = splitDiscordContent(content);
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username: "御前崎 風予報",
-      content,
-      allowed_mentions: { parse: [] }
-    })
-  });
+  for (const chunk of chunks) {
+    const url = new URL(webhookUrl);
+    url.searchParams.set("wait", "true");
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Discord webhook error: ${res.status} ${body}`);
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: "御前崎 風予報",
+        content: chunk,
+        allowed_mentions: {
+          parse: []
+        }
+      })
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Discord webhook error: ${res.status} ${body}`);
+    }
   }
 }
 
 async function main() {
   const data = await fetchWeather();
+
   let startIso;
   let endIso;
   let title;
@@ -202,37 +326,60 @@ async function main() {
   if (mode === "daily") {
     const today = todayJstDate();
     const tomorrow = addDaysToDateString(today, 1);
+
     startIso = `${today}T16:00`;
-    endIso = `${tomorrow}T${String(MORNING_HOUR).padStart(2, "0")}:00`;
+    endIso = `${tomorrow}T${pad(MORNING_HOUR)}:00`;
     title = "📋 16時定時レポート：夕方〜翌朝の風予報";
     force = true;
   } else if (mode === "test") {
-    startIso = nowJstIsoMinute();
-    endIso = jstIsoAfterHours(LOOKAHEAD_HOURS);
+    startIso = currentJstFloorHourIso();
+    endIso = jstIsoAfterHoursFrom(startIso, LOOKAHEAD_HOURS);
     title = "🧪 テスト通知：今後の風予報";
     force = true;
   } else {
-    startIso = nowJstIsoMinute();
-    endIso = jstIsoAfterHours(LOOKAHEAD_HOURS);
+    startIso = currentJstFloorHourIso();
+    endIso = jstIsoAfterHoursFrom(startIso, LOOKAHEAD_HOURS);
     title = `🚨 強風アラート：今後${LOOKAHEAD_HOURS}時間の最大値`;
   }
 
   const items = buildHourlyItems(data, startIso, endIso);
-  if (items.length === 0) throw new Error("対象時間帯の予報データがありません");
+
+  if (items.length === 0) {
+    throw new Error("対象時間帯の予報データがありません");
+  }
 
   const s = summarize(items);
+
   const shouldAlert =
     force ||
     Number(s.peakGust?.gust ?? 0) >= WARNING_GUST ||
     Number(s.peakWind?.wind ?? 0) >= WARNING_WIND;
 
+  // daily、つまり16時レポートのときだけ時間別一覧を付ける
+  const includeHourlyList = mode === "daily";
+
   if (!shouldAlert) {
     console.log("閾値未満のためDiscord通知なし");
-    console.log(buildMessage({ title, startIso, endIso, items, force: true }));
+    console.log(buildMessage({
+      title,
+      startIso,
+      endIso,
+      items,
+      force: true,
+      includeHourlyList
+    }));
     return;
   }
 
-  const message = buildMessage({ title, startIso, endIso, items, force });
+  const message = buildMessage({
+    title,
+    startIso,
+    endIso,
+    items,
+    force,
+    includeHourlyList
+  });
+
   await postDiscord(message);
   console.log("Discordへ通知しました");
 }
