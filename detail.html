@@ -7,16 +7,16 @@
 
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --card2: #334155;
+      --bg: #07111f;
+      --card: rgba(30, 41, 59, 0.88);
+      --line: rgba(148, 163, 184, 0.22);
       --text: #e5e7eb;
       --muted: #94a3b8;
       --blue: #38bdf8;
-      --red: #ef4444;
-      --yellow: #facc15;
-      --orange: #fb923c;
       --green: #34d399;
+      --orange: #fb923c;
+      --yellow: #facc15;
+      --red: #ef4444;
     }
 
     * {
@@ -27,150 +27,137 @@
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
       background:
-        radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 36%),
-        radial-gradient(circle at top left, rgba(168, 85, 247, 0.14), transparent 34%),
+        radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 34%),
+        radial-gradient(circle at top right, rgba(34,197,94,0.10), transparent 30%),
         var(--bg);
       color: var(--text);
     }
 
-    .page {
-      max-width: 1080px;
+    .wrap {
+      max-width: 1040px;
       margin: 0 auto;
-      padding: 20px 14px 42px;
+      padding: 18px 14px 28px;
     }
 
     header {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
-      font-weight: 900;
-      letter-spacing: -0.04em;
+      margin: 0 0 6px;
+      font-size: 27px;
+      line-height: 1.25;
     }
 
-    .lead {
+    .sub {
       color: var(--muted);
-      font-size: 16px;
-      font-weight: 650;
-      line-height: 1.5;
+      font-size: 14px;
+      line-height: 1.6;
     }
 
-    .page-switch {
+    .nav {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin: 18px 0;
+      margin: 14px 0;
     }
 
-    .switch-button {
-      display: block;
+    .nav a {
       text-decoration: none;
+      color: var(--text);
       text-align: center;
-      padding: 15px 10px;
-      border-radius: 18px;
-      font-size: 16px;
       font-weight: 900;
-      color: #dbeafe;
-      background: rgba(30, 41, 59, 0.92);
-      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 13px 10px;
+      border-radius: 15px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.2);
     }
 
-    .switch-button.active {
-      color: #082f49;
-      background: linear-gradient(180deg, #38bdf8, #0ea5e9);
-      border: none;
+    .nav a.active {
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      color: white;
+      border-color: rgba(255,255,255,0.22);
     }
 
     .card {
-      background: rgba(30, 41, 59, 0.94);
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      border-radius: 26px;
-      padding: 20px;
+      background: var(--card);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 22px;
+      box-shadow: 0 16px 44px rgba(0,0,0,0.28);
+      padding: 18px;
       margin: 14px 0;
-      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
       overflow: hidden;
     }
 
-    .card-title {
-      font-size: 22px;
-      font-weight: 950;
-      margin: 0 0 8px;
-      letter-spacing: -0.03em;
-    }
-
-    .small {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 650;
-      line-height: 1.5;
-    }
-
-    .summary-grid {
+    .summary {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      margin-top: 14px;
     }
 
-    .summary {
-      background: rgba(51, 65, 85, 0.82);
+    .metric {
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.16);
       border-radius: 18px;
-      padding: 14px;
-      min-height: 116px;
+      padding: 16px;
+      min-height: 110px;
     }
 
     .label {
       color: #cbd5e1;
       font-size: 13px;
       font-weight: 800;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
     }
 
     .value {
-      font-size: 28px;
+      font-size: 27px;
       font-weight: 950;
-      letter-spacing: -0.04em;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+      line-height: 1.45;
     }
 
     button {
       width: 100%;
-      border: none;
+      border: 0;
       border-radius: 18px;
-      padding: 16px;
-      margin: 10px 0;
-      font-size: 18px;
+      padding: 15px;
+      font-size: 17px;
       font-weight: 950;
+      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
       color: #082f49;
-      background: linear-gradient(180deg, #38bdf8, #0ea5e9);
+      margin: 12px 0;
     }
 
-    .chart-wrap {
-      width: 100%;
-      height: 260px;
-      margin-top: 14px;
-      border-radius: 20px;
-      background: rgba(15, 23, 42, 0.45);
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      padding: 10px;
-      overflow: hidden;
+    .chart-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      margin-bottom: 8px;
     }
 
-    svg {
-      width: 100%;
-      height: 100%;
-      display: block;
+    h2 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.3;
     }
 
     .legend {
       display: flex;
+      gap: 14px;
       flex-wrap: wrap;
-      gap: 10px 16px;
-      margin-top: 12px;
       color: #cbd5e1;
       font-size: 13px;
-      font-weight: 850;
+      font-weight: 750;
+      margin: 8px 0 4px;
     }
 
     .legend span {
@@ -182,41 +169,46 @@
     .dot {
       width: 12px;
       height: 12px;
-      border-radius: 99px;
+      border-radius: 999px;
       display: inline-block;
     }
 
-    .dot.temp { background: var(--orange); }
-    .dot.rain { background: var(--blue); }
-    .dot.humidity { background: var(--green); }
-    .dot.wind { background: var(--blue); }
-    .dot.gust { background: var(--red); }
+    .square {
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+      display: inline-block;
+    }
 
-    .note {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-      margin-top: 8px;
+    .chart-scroll {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    svg {
+      width: 940px;
+      max-width: none;
+      height: 280px;
+      display: block;
     }
 
     .table-scroll {
+      width: 100%;
       overflow-x: auto;
-      margin-top: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.18);
+      -webkit-overflow-scrolling: touch;
     }
 
     table {
       width: 100%;
-      min-width: 840px;
+      min-width: 900px;
       border-collapse: collapse;
-      font-size: 15px;
+      font-size: 14px;
     }
 
-    th,
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
       text-align: right;
       white-space: nowrap;
     }
@@ -229,31 +221,47 @@
     }
 
     th {
-      background: rgba(15, 23, 42, 0.38);
-      color: #e2e8f0;
-      font-weight: 950;
+      color: #cbd5e1;
+      font-size: 13px;
     }
 
     .date-row td {
-      background: rgba(15, 23, 42, 0.68);
-      color: #e0f2fe;
+      color: #e2e8f0;
+      background: rgba(148, 163, 184, 0.10);
       font-weight: 950;
-      font-size: 18px;
       text-align: left !important;
+      font-size: 15px;
     }
 
-    .gust-normal {
-      color: var(--text);
-      font-weight: 850;
-    }
-
-    .gust-yellow {
-      color: var(--yellow);
+    .current-row td {
+      background: rgba(239, 68, 68, 0.14);
       font-weight: 950;
     }
 
-    .gust-red {
-      color: var(--red);
+    .current-row td:first-child {
+      color: #fee2e2;
+    }
+
+    .now-badge {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #ef4444;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 950;
+      line-height: 1.4;
+      vertical-align: middle;
+    }
+
+    .gust-warn {
+      color: #fde047;
+      font-weight: 950;
+    }
+
+    .gust-stop {
+      color: #f87171;
       font-weight: 950;
     }
 
@@ -261,130 +269,125 @@
       color: #64748b;
       font-size: 12px;
       line-height: 1.6;
-      padding: 18px 2px 0;
+      padding: 8px 2px 20px;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 760px) {
+      .wrap {
+        padding: 18px 12px 26px;
+      }
+
       h1 {
-        font-size: 28px;
-      }
-
-      .summary-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .chart-wrap {
-        height: 230px;
-      }
-
-      .value {
-        font-size: 26px;
-      }
-    }
-
-    @media (max-width: 430px) {
-      .page {
-        padding: 18px 12px 36px;
+        font-size: 25px;
       }
 
       .summary {
-        padding: 12px;
+        grid-template-columns: 1fr 1fr;
       }
 
       .value {
         font-size: 24px;
+      }
+
+      .card {
+        padding: 16px;
+        border-radius: 20px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="page">
+  <main class="wrap">
     <header>
       <h1>御前崎・池新田 毎時詳細</h1>
-      <div class="lead">
-        今日0時から明日23時までの気温・降水量・湿度・平均風速・突風を表示します。
+      <div class="sub">
+        今日0時〜明日24時までの詳細予報です。<br>
+        気温・湿度・降水量・風速・突風を2日分表示します。
       </div>
-      <div class="small">Open-Meteo API / 10m風速・突風</div>
+
+      <nav class="nav">
+        <a href="./index.html">ダッシュボード</a>
+        <a class="active" href="./detail.html">毎時詳細</a>
+      </nav>
     </header>
 
-    <nav class="page-switch">
-      <a class="switch-button" href="./index.html">ダッシュボード</a>
-      <a class="switch-button active" href="./detail.html">毎時詳細</a>
-    </nav>
-
     <section class="card">
-      <div class="card-title">2日分サマリー</div>
-      <div class="small">
-        対象：<span id="rangeText">--</span><br>
-        最終取得：<span id="updatedAt">--</span>
+      <div class="summary">
+        <div class="metric">
+          <div class="label">現在</div>
+          <div id="nowWeather" class="value">--</div>
+          <div id="nowTime" class="small">--</div>
+        </div>
+
+        <div class="metric">
+          <div class="label">現在の気温 / 湿度</div>
+          <div class="value"><span id="nowTemp">--</span>℃</div>
+          <div class="small">湿度：<span id="nowHumidity">--</span>%</div>
+        </div>
+
+        <div class="metric">
+          <div class="label">現在の風速 / 突風</div>
+          <div class="value"><span id="nowWind">--</span> m/s</div>
+          <div class="small">突風：<span id="nowGust">--</span> m/s</div>
+        </div>
+
+        <div class="metric">
+          <div class="label">最大突風</div>
+          <div id="maxGustBox" class="value">-- m/s</div>
+          <div id="maxGustTime" class="small">--</div>
+        </div>
       </div>
 
-      <div class="summary-grid">
-        <div class="summary">
-          <div class="label">最高気温</div>
-          <div class="value"><span id="maxTemp">--</span>℃</div>
-          <div class="small" id="maxTempTime">--</div>
-        </div>
-
-        <div class="summary">
-          <div class="label">最大湿度</div>
-          <div class="value"><span id="maxHumidity">--</span>%</div>
-          <div class="small" id="maxHumidityTime">--</div>
-        </div>
-
-        <div class="summary">
-          <div class="label">最大降水量</div>
-          <div class="value"><span id="maxRain">--</span>mm</div>
-          <div class="small" id="maxRainTime">--</div>
-        </div>
-
-        <div class="summary">
-          <div class="label">最大突風</div>
-          <div class="value"><span id="maxGust">--</span>m/s</div>
-          <div class="small" id="maxGustTime">--</div>
-        </div>
+      <div class="small">
+        現在時刻：<span id="currentNowText">--</span><br>
+        最終取得：<span id="updatedAt">--</span>
       </div>
     </section>
 
     <button onclick="loadWeather()">更新する</button>
 
     <section class="card">
-      <div class="card-title">気温 + 降水量 + 湿度</div>
-      <div class="small">今日0時〜明日23時</div>
-
-      <div class="chart-wrap">
-        <svg id="weatherChart" viewBox="0 0 900 260" preserveAspectRatio="none"></svg>
+      <div class="chart-title">
+        <h2>気温 + 降水量 + 湿度</h2>
+        <div class="small">今日0時〜明日24時</div>
       </div>
 
       <div class="legend">
-        <span><i class="dot temp"></i>気温</span>
-        <span><i class="dot rain"></i>降水量</span>
-        <span><i class="dot humidity"></i>湿度</span>
+        <span><i class="dot" style="background:#fb923c;"></i> 気温</span>
+        <span><i class="square" style="background:#38bdf8;"></i> 降水量</span>
+        <span><i class="dot" style="background:#34d399;"></i> 湿度</span>
+        <span><i class="dot" style="background:#ef4444;"></i> 赤い縦線：現在時刻</span>
       </div>
 
-      <div class="note">
-        ※見やすくするため、気温・降水量・湿度はそれぞれ個別スケールで同じグラフ内に重ねています。
+      <div class="chart-scroll">
+        <svg id="weatherChart" viewBox="0 0 940 280" aria-label="気温・降水量・湿度のグラフ"></svg>
       </div>
     </section>
 
     <section class="card">
-      <div class="card-title">平均風速 + 突風</div>
-      <div class="small">突風15m/s以上は黄色、20m/s以上は赤で表示</div>
-
-      <div class="chart-wrap">
-        <svg id="windChart" viewBox="0 0 900 260" preserveAspectRatio="none"></svg>
+      <div class="chart-title">
+        <h2>平均風速 + 突風</h2>
+        <div class="small">今日0時〜明日24時</div>
       </div>
 
       <div class="legend">
-        <span><i class="dot wind"></i>平均風速</span>
-        <span><i class="dot gust"></i>突風</span>
+        <span><i class="dot" style="background:#38bdf8;"></i> 平均風速</span>
+        <span><i class="dot" style="background:#ef4444;"></i> 突風</span>
+        <span><i class="square" style="background:#facc15;"></i> 突風15m/s以上</span>
+        <span><i class="square" style="background:#ef4444;"></i> 突風20m/s以上</span>
+      </div>
+
+      <div class="chart-scroll">
+        <svg id="windChart" viewBox="0 0 940 280" aria-label="平均風速と突風のグラフ"></svg>
       </div>
     </section>
 
-    <section class="card" id="hourlyTable">
-      <div class="card-title">毎時一覧</div>
-      <div class="small">今日0時〜明日23時</div>
+    <section class="card">
+      <div class="chart-title">
+        <h2>毎時詳細</h2>
+        <div class="small">現在の時間は赤っぽく表示</div>
+      </div>
 
       <div class="table-scroll">
         <table>
@@ -406,82 +409,28 @@
       </div>
     </section>
 
-    <nav class="page-switch">
-      <a class="switch-button" href="./index.html">ダッシュボードへ戻る</a>
-      <a class="switch-button active" href="./detail.html">毎時詳細</a>
-    </nav>
-
     <footer>
-      このページは外部気象データを利用した運用判断支援ツールです。
-      防災判断には気象庁などの公式情報も確認してください。
+      予報は気象状況により変わることがあります。屋外作業・ゴルフ練習場・乗馬等の判断には、現地状況と公式情報も確認してください。
     </footer>
-  </div>
+  </main>
 
   <script>
     const LAT = 34.647;
     const LON = 138.126;
 
-    const WEATHER = {
-      0: ["☀️", "快晴"],
-      1: ["🌤️", "晴"],
-      2: ["🌤️", "一部曇"],
-      3: ["☁️", "曇"],
-      45: ["🌫️", "霧"],
-      48: ["🌫️", "霧"],
-      51: ["🌦️", "霧雨"],
-      53: ["🌦️", "霧雨"],
-      55: ["🌦️", "霧雨"],
-      56: ["🌧️", "着氷性霧雨"],
-      57: ["🌧️", "着氷性霧雨"],
-      61: ["🌧️", "小雨"],
-      63: ["🌧️", "雨"],
-      65: ["🌧️", "強い雨"],
-      66: ["🌧️", "着氷性雨"],
-      67: ["🌧️", "着氷性雨"],
-      71: ["🌨️", "小雪"],
-      73: ["🌨️", "雪"],
-      75: ["🌨️", "強い雪"],
-      77: ["🌨️", "雪粒"],
-      80: ["🌦️", "にわか雨"],
-      81: ["🌦️", "にわか雨"],
-      82: ["⛈️", "激しいにわか雨"],
-      85: ["🌨️", "にわか雪"],
-      86: ["🌨️", "強いにわか雪"],
-      95: ["⛈️", "雷雨"],
-      96: ["⛈️", "雷雨"],
-      99: ["⛈️", "雷雨"]
-    };
-
-    function weatherText(code) {
-      return WEATHER[code] || ["", "不明"];
-    }
-
-    function degToDir(deg) {
-      if (deg === null || deg === undefined || Number.isNaN(deg)) return "--";
-      const dirs = [
-        "北", "北北東", "北東", "東北東",
-        "東", "東南東", "南東", "南南東",
-        "南", "南南西", "南西", "西南西",
-        "西", "西北西", "北西", "北北西"
-      ];
-      return dirs[Math.round(deg / 22.5) % 16];
-    }
-
-    function fmt1(v) {
-      if (v === null || v === undefined || Number.isNaN(v)) return "--";
-      return Number(v).toFixed(1);
-    }
-
-    function fmt0(v) {
-      if (v === null || v === undefined || Number.isNaN(v)) return "--";
-      return Math.round(Number(v));
-    }
-
-    function parseApiTime(s) {
+    function parseLocalTime(s) {
       const [datePart, timePart] = s.split("T");
       const [y, m, d] = datePart.split("-").map(Number);
       const [hh, mm] = timePart.split(":").map(Number);
       return new Date(y, m - 1, d, hh, mm || 0, 0, 0);
+    }
+
+    function fmt1(v) {
+      return Number(v ?? 0).toFixed(1);
+    }
+
+    function fmt0(v) {
+      return Math.round(Number(v ?? 0));
     }
 
     function md(d) {
@@ -493,7 +442,7 @@
     }
 
     function mdHour(d) {
-      return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}時`;
+      return `${md(d)} ${hourLabel(d)}`;
     }
 
     function sameDate(a, b) {
@@ -502,22 +451,38 @@
         a.getDate() === b.getDate();
     }
 
-    function getTodayStart() {
+    function startOfToday() {
       const d = new Date();
       d.setHours(0, 0, 0, 0);
       return d;
     }
 
-    function getDetailEnd() {
-      const d = getTodayStart();
+    function dayAfterTomorrowStart() {
+      const d = startOfToday();
       d.setDate(d.getDate() + 2);
+      d.setHours(0, 0, 0, 0);
       return d;
     }
 
-    function gustClass(gust) {
-      if (gust >= 20) return "gust-red";
-      if (gust >= 15) return "gust-yellow";
-      return "gust-normal";
+    function degToDir(deg) {
+      const dirs = ["北", "北北東", "北東", "東北東", "東", "東南東", "南東", "南南東", "南", "南南西", "南西", "西南西", "西", "西北西", "北西", "北北西"];
+      return dirs[Math.round(Number(deg || 0) / 22.5) % 16];
+    }
+
+    function weatherText(code) {
+      const c = Number(code);
+      if (c === 0) return ["☀️", "快晴"];
+      if (c === 1) return ["🌤️", "晴れ"];
+      if (c === 2) return ["🌤️", "一部曇"];
+      if (c === 3) return ["☁️", "曇り"];
+      if ([45, 48].includes(c)) return ["🌫️", "霧"];
+      if ([51, 53, 55, 56, 57].includes(c)) return ["🌦️", "霧雨"];
+      if ([61, 63, 65, 66, 67].includes(c)) return ["🌧️", "雨"];
+      if ([71, 73, 75, 77].includes(c)) return ["🌨️", "雪"];
+      if ([80, 81, 82].includes(c)) return ["🌦️", "にわか雨"];
+      if ([85, 86].includes(c)) return ["🌨️", "にわか雪"];
+      if ([95, 96, 99].includes(c)) return ["⛈️", "雷雨"];
+      return ["🌡️", "不明"];
     }
 
     function gustMark(gust) {
@@ -526,100 +491,44 @@
       return "";
     }
 
-    async function fetchJsonWithRetry(url, retries = 3) {
-      let lastError;
-
-      for (let i = 0; i < retries; i++) {
-        try {
-          const res = await fetch(url, { cache: "no-store" });
-
-          if (!res.ok) {
-            throw new Error(`API error ${res.status}`);
-          }
-
-          return await res.json();
-        } catch (e) {
-          lastError = e;
-          await new Promise(resolve => setTimeout(resolve, 800 * (i + 1)));
-        }
-      }
-
-      throw lastError;
+    function gustClass(gust) {
+      if (gust >= 20) return "gust-stop";
+      if (gust >= 15) return "gust-warn";
+      return "";
     }
 
-    async function loadWeather() {
-      const url =
-        `https://api.open-meteo.com/v1/forecast` +
-        `?latitude=${LAT}&longitude=${LON}` +
-        `&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
-        `&wind_speed_unit=ms` +
-        `&timezone=Asia%2FTokyo` +
-        `&forecast_days=3`;
-
-      const data = await fetchJsonWithRetry(url);
-
-      const todayStart = getTodayStart();
-      const detailEnd = getDetailEnd();
-
-      const rows = data.hourly.time.map((time, i) => {
-        const d = parseApiTime(time);
-
-        return {
-          time,
-          date: d,
-          temp: data.hourly.temperature_2m[i],
-          apparent: data.hourly.apparent_temperature[i],
-          humidity: data.hourly.relative_humidity_2m[i],
-          pop: data.hourly.precipitation_probability[i],
-          rain: data.hourly.precipitation[i],
-          code: data.hourly.weather_code[i],
-          wind: data.hourly.wind_speed_10m[i],
-          dirDeg: data.hourly.wind_direction_10m[i],
-          gust: data.hourly.wind_gusts_10m[i]
-        };
-      }).filter(r => r.date >= todayStart && r.date < detailEnd);
-
-      document.getElementById("rangeText").textContent =
-        `${md(todayStart)} 0時 〜 ${md(new Date(detailEnd.getTime() - 60 * 60 * 1000))} 23時`;
-
-      document.getElementById("updatedAt").textContent =
-        new Date().toLocaleString("ja-JP");
-
-      updateSummary(rows);
-      drawWeatherChart(rows);
-      drawWindChart(rows);
-      renderTable(rows);
-    }
-
-    function updateSummary(rows) {
-      if (!rows.length) return;
-
-      const maxTemp = rows.reduce((a, b) => b.temp > a.temp ? b : a, rows[0]);
-      const maxHumidity = rows.reduce((a, b) => b.humidity > a.humidity ? b : a, rows[0]);
-      const maxRain = rows.reduce((a, b) => b.rain > a.rain ? b : a, rows[0]);
-      const maxGust = rows.reduce((a, b) => b.gust > a.gust ? b : a, rows[0]);
-
-      document.getElementById("maxTemp").textContent = fmt1(maxTemp.temp);
-      document.getElementById("maxTempTime").textContent = mdHour(maxTemp.date);
-
-      document.getElementById("maxHumidity").textContent = fmt0(maxHumidity.humidity);
-      document.getElementById("maxHumidityTime").textContent = mdHour(maxHumidity.date);
-
-      document.getElementById("maxRain").textContent = fmt1(maxRain.rain);
-      document.getElementById("maxRainTime").textContent = mdHour(maxRain.date);
-
-      document.getElementById("maxGust").textContent = fmt1(maxGust.gust);
-      document.getElementById("maxGustTime").textContent =
-        `${mdHour(maxGust.date)}・${degToDir(maxGust.dirDeg)}`;
+    function buildRows(data) {
+      const h = data.hourly;
+      return h.time.map((t, i) => ({
+        date: parseLocalTime(t),
+        code: h.weather_code[i],
+        temp: h.temperature_2m[i],
+        feels: h.apparent_temperature[i],
+        humidity: h.relative_humidity_2m[i],
+        pop: h.precipitation_probability[i],
+        rain: h.rain[i],
+        wind: h.wind_speed_10m[i],
+        gust: h.wind_gusts_10m[i],
+        dirDeg: h.wind_direction_10m[i]
+      }));
     }
 
     function chartBase(svg) {
       svg.innerHTML = "";
 
-      for (const y of [36, 82, 128, 174, 220]) {
+      const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      bg.setAttribute("x", 0);
+      bg.setAttribute("y", 0);
+      bg.setAttribute("width", 940);
+      bg.setAttribute("height", 280);
+      bg.setAttribute("rx", 18);
+      bg.setAttribute("fill", "rgba(15,23,42,0.20)");
+      svg.appendChild(bg);
+
+      for (let y of [26, 74, 122, 170, 218]) {
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", 48);
-        line.setAttribute("x2", 876);
+        line.setAttribute("x1", 52);
+        line.setAttribute("x2", 880);
         line.setAttribute("y1", y);
         line.setAttribute("y2", y);
         line.setAttribute("stroke", "rgba(148,163,184,0.22)");
@@ -628,48 +537,93 @@
       }
     }
 
-    function makePolyline(points, color, width = 5) {
-      const pl = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-      pl.setAttribute("points", points);
-      pl.setAttribute("fill", "none");
-      pl.setAttribute("stroke", color);
-      pl.setAttribute("stroke-width", width);
-      pl.setAttribute("stroke-linecap", "round");
-      pl.setAttribute("stroke-linejoin", "round");
-      return pl;
+    function makePolyline(points, color, width) {
+      const p = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      p.setAttribute("points", points);
+      p.setAttribute("fill", "none");
+      p.setAttribute("stroke", color);
+      p.setAttribute("stroke-width", width);
+      p.setAttribute("stroke-linecap", "round");
+      p.setAttribute("stroke-linejoin", "round");
+      return p;
     }
 
-    function makeText(x, y, text, size = 18, color = "#cbd5e1", anchor = "middle") {
+    function makeText(x, y, text, size, color, anchor = "middle", weight = "800") {
       const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
       t.setAttribute("x", x);
       t.setAttribute("y", y);
       t.setAttribute("fill", color);
       t.setAttribute("font-size", size);
-      t.setAttribute("font-weight", "850");
+      t.setAttribute("font-weight", weight);
       t.setAttribute("text-anchor", anchor);
       t.textContent = text;
       return t;
     }
 
     function addTimeLabels(svg, rows, left, right, y) {
+      if (!rows.length) return;
       const n = rows.length;
       const width = right - left;
-      const x = i => left + (i / Math.max(n - 1, 1)) * width;
+      const step = Math.max(1, Math.ceil(n / 10));
 
       rows.forEach((r, i) => {
-        const h = r.date.getHours();
-
-        if (h === 0 || h === 6 || h === 12 || h === 18) {
-          const label = h === 0 ? md(r.date) : `${h}時`;
-          svg.appendChild(makeText(x(i), y, label, 18, "#94a3b8"));
-        }
+        if (i % step !== 0 && i !== n - 1) return;
+        const x = left + (i / Math.max(n - 1, 1)) * width;
+        svg.appendChild(makeText(x, y, mdHour(r.date), 13, "#94a3b8"));
       });
+    }
+
+    function currentMarkerX(rows, left, right) {
+      if (!rows.length) return null;
+
+      const now = new Date();
+      const start = rows[0].date.getTime();
+      const end = rows[rows.length - 1].date.getTime();
+      const current = now.getTime();
+
+      if (current < start || current > end) return null;
+
+      const ratio = (current - start) / Math.max(end - start, 1);
+      return left + ratio * (right - left);
+    }
+
+    function drawCurrentTimeMarker(svg, rows, left, right, top, bottom) {
+      const x = currentMarkerX(rows, left, right);
+      if (x === null) return;
+
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", x);
+      line.setAttribute("x2", x);
+      line.setAttribute("y1", top);
+      line.setAttribute("y2", bottom);
+      line.setAttribute("stroke", "#ef4444");
+      line.setAttribute("stroke-width", "2.5");
+      line.setAttribute("stroke-dasharray", "6 4");
+      svg.appendChild(line);
+
+      const pill = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      pill.setAttribute("x", x - 24);
+      pill.setAttribute("y", 4);
+      pill.setAttribute("width", 48);
+      pill.setAttribute("height", 22);
+      pill.setAttribute("rx", 11);
+      pill.setAttribute("fill", "#ef4444");
+      svg.appendChild(pill);
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", x);
+      text.setAttribute("y", 19);
+      text.setAttribute("fill", "#ffffff");
+      text.setAttribute("font-size", "13");
+      text.setAttribute("font-weight", "950");
+      text.setAttribute("text-anchor", "middle");
+      text.textContent = "現在";
+      svg.appendChild(text);
     }
 
     function drawWeatherChart(rows) {
       const svg = document.getElementById("weatherChart");
       chartBase(svg);
-
       if (!rows.length) return;
 
       const left = 52;
@@ -679,9 +633,9 @@
       const width = right - left;
       const height = bottom - top;
 
-      const temps = rows.map(r => r.temp);
-      const humidities = rows.map(r => r.humidity);
-      const rains = rows.map(r => r.rain);
+      const temps = rows.map(r => Number(r.temp || 0));
+      const humidities = rows.map(r => Number(r.humidity || 0));
+      const rains = rows.map(r => Number(r.rain || 0));
 
       const tempMin = Math.floor(Math.min(...temps) - 2);
       const tempMax = Math.ceil(Math.max(...temps) + 2);
@@ -694,29 +648,31 @@
       const yRain = v => bottom - (v / rainMax) * height;
 
       rows.forEach((r, i) => {
-        const barW = Math.max(5, width / n * 0.55);
-        const barH = bottom - yRain(r.rain);
+        const barW = Math.max(3, width / n * 0.55);
+        const barH = bottom - yRain(Number(r.rain || 0));
 
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("x", x(i) - barW / 2);
         rect.setAttribute("y", bottom - barH);
         rect.setAttribute("width", barW);
         rect.setAttribute("height", barH);
-        rect.setAttribute("rx", 4);
+        rect.setAttribute("rx", 3);
         rect.setAttribute("fill", "rgba(56,189,248,0.55)");
         svg.appendChild(rect);
       });
 
-      const tempPoints = rows.map((r, i) => `${x(i)},${yTemp(r.temp)}`).join(" ");
-      const humidityPoints = rows.map((r, i) => `${x(i)},${yHumidity(r.humidity)}`).join(" ");
+      const tempPoints = rows.map((r, i) => `${x(i)},${yTemp(Number(r.temp || 0))}`).join(" ");
+      const humidityPoints = rows.map((r, i) => `${x(i)},${yHumidity(Number(r.humidity || 0))}`).join(" ");
 
       svg.appendChild(makePolyline(tempPoints, "#fb923c", 5));
       svg.appendChild(makePolyline(humidityPoints, "#34d399", 5));
 
-      svg.appendChild(makeText(50, 24, `${tempMax}℃`, 18, "#fb923c", "start"));
-      svg.appendChild(makeText(50, 238, `${tempMin}℃`, 18, "#fb923c", "start"));
-      svg.appendChild(makeText(880, 24, "100%", 18, "#34d399", "end"));
-      svg.appendChild(makeText(880, 238, "0%", 18, "#34d399", "end"));
+      drawCurrentTimeMarker(svg, rows, left, right, top, bottom);
+
+      svg.appendChild(makeText(50, 24, `${tempMax}℃`, 17, "#fb923c", "start"));
+      svg.appendChild(makeText(50, 238, `${tempMin}℃`, 17, "#fb923c", "start"));
+      svg.appendChild(makeText(880, 24, "100%", 17, "#34d399", "end"));
+      svg.appendChild(makeText(880, 238, "0%", 17, "#34d399", "end"));
 
       addTimeLabels(svg, rows, left, right, 252);
     }
@@ -724,7 +680,6 @@
     function drawWindChart(rows) {
       const svg = document.getElementById("windChart");
       chartBase(svg);
-
       if (!rows.length) return;
 
       const left = 52;
@@ -734,34 +689,38 @@
       const width = right - left;
       const height = bottom - top;
 
-      const maxWindValue = Math.max(...rows.map(r => Math.max(r.wind, r.gust)), 20);
+      const maxWindValue = Math.max(...rows.map(r => Math.max(Number(r.wind || 0), Number(r.gust || 0))), 20);
       const scaleMax = Math.ceil(maxWindValue / 5) * 5;
       const n = rows.length;
 
       const x = i => left + (i / Math.max(n - 1, 1)) * width;
       const y = v => bottom - (v / scaleMax) * height;
 
-      const windPoints = rows.map((r, i) => `${x(i)},${y(r.wind)}`).join(" ");
-      const gustPoints = rows.map((r, i) => `${x(i)},${y(r.gust)}`).join(" ");
+      const windPoints = rows.map((r, i) => `${x(i)},${y(Number(r.wind || 0))}`).join(" ");
+      const gustPoints = rows.map((r, i) => `${x(i)},${y(Number(r.gust || 0))}`).join(" ");
 
       svg.appendChild(makePolyline(windPoints, "#38bdf8", 5));
       svg.appendChild(makePolyline(gustPoints, "#ef4444", 5));
 
       rows.forEach((r, i) => {
-        if (r.gust >= 15) {
+        const gust = Number(r.gust || 0);
+
+        if (gust >= 15) {
           const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
           c.setAttribute("cx", x(i));
-          c.setAttribute("cy", y(r.gust));
-          c.setAttribute("r", r.gust >= 20 ? 7 : 6);
-          c.setAttribute("fill", r.gust >= 20 ? "#ef4444" : "#facc15");
+          c.setAttribute("cy", y(gust));
+          c.setAttribute("r", gust >= 20 ? 7 : 6);
+          c.setAttribute("fill", gust >= 20 ? "#ef4444" : "#facc15");
           c.setAttribute("stroke", "rgba(255,255,255,0.85)");
           c.setAttribute("stroke-width", "1");
           svg.appendChild(c);
         }
       });
 
-      svg.appendChild(makeText(50, 24, `${scaleMax}m/s`, 18, "#cbd5e1", "start"));
-      svg.appendChild(makeText(50, 238, "0m/s", 18, "#cbd5e1", "start"));
+      drawCurrentTimeMarker(svg, rows, left, right, top, bottom);
+
+      svg.appendChild(makeText(50, 24, `${scaleMax}m/s`, 17, "#cbd5e1", "start"));
+      svg.appendChild(makeText(50, 238, "0m/s", 17, "#cbd5e1", "start"));
 
       addTimeLabels(svg, rows, left, right, 252);
     }
@@ -771,6 +730,7 @@
       tbody.innerHTML = "";
 
       let lastDate = null;
+      const now = new Date();
 
       rows.forEach(r => {
         if (!lastDate || !sameDate(lastDate, r.date)) {
@@ -785,9 +745,21 @@
         const mark = gustMark(r.gust);
         const gClass = gustClass(r.gust);
 
+        const isCurrentHour =
+          now.getFullYear() === r.date.getFullYear() &&
+          now.getMonth() === r.date.getMonth() &&
+          now.getDate() === r.date.getDate() &&
+          now.getHours() === r.date.getHours();
+
+        const timeLabel = isCurrentHour
+          ? `${hourLabel(r.date)} <span class="now-badge">現在</span>`
+          : hourLabel(r.date);
+
         const tr = document.createElement("tr");
+        if (isCurrentHour) tr.className = "current-row";
+
         tr.innerHTML = `
-          <td>${hourLabel(r.date)}</td>
+          <td>${timeLabel}</td>
           <td>${icon} ${text}</td>
           <td>${fmt1(r.temp)}℃</td>
           <td>${fmt0(r.humidity)}%</td>
@@ -801,9 +773,61 @@
       });
     }
 
+    async function loadWeather() {
+      const url =
+        `https://api.open-meteo.com/v1/forecast` +
+        `?latitude=${LAT}&longitude=${LON}` +
+        `&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
+        `&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation_probability,rain,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
+        `&wind_speed_unit=ms` +
+        `&timezone=Asia%2FTokyo` +
+        `&forecast_days=3`;
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`Open-Meteo API error: ${res.status}`);
+      }
+
+      const data = await res.json();
+      const rows = buildRows(data);
+
+      const start = startOfToday();
+      const end = dayAfterTomorrowStart();
+      const detailRows = rows.filter(r => r.date >= start && r.date < end);
+
+      const c = data.current;
+      const [icon, text] = weatherText(c.weather_code);
+
+      document.getElementById("nowWeather").textContent = `${icon} ${text}`;
+      document.getElementById("nowTime").textContent = `予報時刻：${c.time ? mdHour(parseLocalTime(c.time)) : "--"}`;
+      document.getElementById("nowTemp").textContent = fmt1(c.temperature_2m);
+      document.getElementById("nowHumidity").textContent = fmt0(c.relative_humidity_2m);
+      document.getElementById("nowWind").textContent = fmt1(c.wind_speed_10m);
+      document.getElementById("nowGust").textContent = fmt1(c.wind_gusts_10m);
+
+      const maxGustRow = detailRows.reduce((a, b) => Number(b.gust) > Number(a.gust) ? b : a, detailRows[0]);
+      if (maxGustRow) {
+        const box = document.getElementById("maxGustBox");
+        box.textContent = `${fmt1(maxGustRow.gust)} m/s`;
+        box.className = "value";
+        if (maxGustRow.gust >= 20) box.classList.add("gust-stop");
+        else if (maxGustRow.gust >= 15) box.classList.add("gust-warn");
+
+        document.getElementById("maxGustTime").textContent =
+          `${mdHour(maxGustRow.date)}（${degToDir(maxGustRow.dirDeg)}）`;
+      }
+
+      document.getElementById("currentNowText").textContent = mdHour(new Date());
+      document.getElementById("updatedAt").textContent = new Date().toLocaleString("ja-JP");
+
+      drawWeatherChart(detailRows);
+      drawWindChart(detailRows);
+      renderTable(detailRows);
+    }
+
     loadWeather().catch(err => {
       console.error(err);
-      alert("天気データの取得に失敗しました。少し時間をおいて更新してください。");
+      alert("天気データの取得に失敗しました。少し時間をおいて再読み込みしてください。");
     });
   </script>
 </body>
