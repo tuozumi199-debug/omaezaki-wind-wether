@@ -3,28 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>御前崎・池新田 天気と風</title>
+  <title>池新田 風速予測</title>
 
   <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --card2: #334155;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --line: #475569;
-      --blue: #38bdf8;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: #0f172a;
+      color: #e5e7eb;
     }
 
     header {
@@ -37,59 +23,39 @@
     }
 
     .sub {
-      color: var(--muted);
+      color: #94a3b8;
       font-size: 13px;
-      line-height: 1.5;
     }
 
     .card {
-      background: var(--card);
+      background: #1e293b;
       margin: 12px;
       padding: 16px;
       border-radius: 18px;
       box-shadow: 0 8px 20px rgba(0,0,0,.25);
     }
 
-    .main-weather {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .weather-icon {
-      font-size: 48px;
-      line-height: 1;
-    }
-
-    .weather-text {
-      font-size: 22px;
-      font-weight: 700;
-    }
-
     .big {
       font-size: 42px;
-      font-weight: 750;
+      font-weight: 700;
       line-height: 1.1;
     }
 
     .unit {
       font-size: 18px;
-      color: var(--muted);
+      color: #94a3b8;
     }
 
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-top: 12px;
     }
 
     .mini {
-      background: var(--card2);
+      background: #334155;
       padding: 12px;
       border-radius: 14px;
-      min-height: 78px;
     }
 
     .label {
@@ -103,14 +69,9 @@
       font-weight: 700;
     }
 
-    .small-value {
-      font-size: 16px;
-      font-weight: 700;
-    }
-
     .risk {
       font-size: 24px;
-      font-weight: 750;
+      font-weight: 700;
       padding: 12px;
       border-radius: 14px;
       text-align: center;
@@ -118,7 +79,6 @@
     }
 
     .normal { background: #14532d; }
-    .rain { background: #0c4a6e; }
     .caution { background: #854d0e; }
     .warning { background: #7f1d1d; }
     .stop { background: #581c87; }
@@ -131,39 +91,50 @@
       border-radius: 14px;
       font-size: 16px;
       font-weight: 700;
-      background: var(--blue);
+      background: #38bdf8;
       color: #082f49;
     }
 
-    button:active {
-      opacity: .75;
+    .chart-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 12px;
+      margin-top: 12px;
     }
 
-    .table-wrap {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+    .chart-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 260px;
+      width: 100%;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
-      min-width: 560px;
     }
 
     th, td {
-      padding: 9px 6px;
-      border-bottom: 1px solid var(--line);
+      padding: 9px 4px;
+      border-bottom: 1px solid #334155;
       text-align: right;
-      white-space: nowrap;
+      vertical-align: top;
     }
 
     th:first-child, td:first-child {
       text-align: left;
+      white-space: nowrap;
     }
 
     .bar-wrap {
-      background: #475569;
+      background: #334155;
       height: 8px;
       border-radius: 999px;
       overflow: hidden;
@@ -172,283 +143,202 @@
 
     .bar {
       height: 8px;
-      background: var(--blue);
+      background: #38bdf8;
     }
 
-    .notice {
-      background: rgba(56, 189, 248, .12);
-      border: 1px solid rgba(56, 189, 248, .35);
-      color: #bae6fd;
-      padding: 12px;
-      border-radius: 14px;
-      font-size: 13px;
-      line-height: 1.6;
-      margin-top: 12px;
+    .gust-yellow {
+      color: #facc15;
+      font-weight: 700;
+    }
+
+    .gust-red {
+      color: #f87171;
+      font-weight: 700;
     }
 
     .error {
-      background: rgba(239, 68, 68, .15);
-      border: 1px solid rgba(239, 68, 68, .45);
-      color: #fecaca;
+      background: #7f1d1d;
+      color: #fee2e2;
+      margin: 12px;
       padding: 12px;
       border-radius: 14px;
-      font-size: 13px;
-      line-height: 1.6;
-      margin: 12px;
       display: none;
+      font-size: 14px;
+      line-height: 1.5;
     }
 
     footer {
       padding: 16px;
       color: #64748b;
       font-size: 12px;
-      line-height: 1.6;
+      line-height: 1.5;
     }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>御前崎・池新田 天気と風</h1>
-    <div class="sub">
-      気温・天気・降水確率・風速・突風を表示します。<br>
-      位置：御前崎市池新田付近
-    </div>
+    <h1>御前崎・池新田 風速予測</h1>
+    <div class="sub">Open-Meteo API / 10m風速・突風・気温・降水量</div>
   </header>
 
   <div id="errorBox" class="error"></div>
 
   <section class="card">
-    <div class="main-weather">
-      <div>
-        <div class="label">現在の天気</div>
-        <div class="weather-text">
-          <span id="currentWeatherIcon">--</span>
-          <span id="currentWeather">取得中</span>
-        </div>
-      </div>
-      <div class="weather-icon" id="largeWeatherIcon">🌤️</div>
+    <div class="label">現在の風速</div>
+    <div>
+      <span id="currentWind" class="big">--</span>
+      <span class="unit">m/s</span>
     </div>
 
-    <div class="grid">
-      <div class="mini">
-        <div class="label">気温</div>
-        <div class="value"><span id="currentTemp">--</span> ℃</div>
-      </div>
-      <div class="mini">
-        <div class="label">体感温度</div>
-        <div class="value"><span id="currentFeels">--</span> ℃</div>
-      </div>
-    </div>
+    <div id="riskBox" class="risk normal">取得待ち</div>
 
-    <div class="grid">
-      <div class="mini">
-        <div class="label">現在の風速</div>
-        <div class="value"><span id="currentWind">--</span> m/s</div>
-      </div>
+    <div class="grid" style="margin-top:14px;">
       <div class="mini">
         <div class="label">現在の突風</div>
         <div class="value"><span id="currentGust">--</span> m/s</div>
       </div>
-    </div>
-
-    <div class="grid">
       <div class="mini">
         <div class="label">風向</div>
         <div class="value" id="currentDir">--</div>
       </div>
       <div class="mini">
-        <div class="label">現在の降水量</div>
-        <div class="value"><span id="currentRain">--</span> mm</div>
+        <div class="label">気温</div>
+        <div class="value"><span id="currentTemp">--</span> ℃</div>
+      </div>
+      <div class="mini">
+        <div class="label">天気</div>
+        <div class="value" id="currentWeather">--</div>
       </div>
     </div>
 
-    <div id="riskBox" class="risk normal">取得中</div>
-
-    <div class="notice">
-      <div>今後24時間の最大突風：<strong><span id="maxGust24">--</span> m/s</strong></div>
-      <div>今後24時間の最高気温：<strong><span id="maxTemp24">--</span> ℃</strong></div>
-      <div>今後24時間の最大降水確率：<strong><span id="maxRainProb24">--</span> %</strong></div>
-    </div>
-
     <div class="sub" style="margin-top:12px;">
-      予報時刻：<span id="forecastTime">--</span><br>
-      最終取得：<span id="updatedAt">--</span>
+      最終更新：<span id="updatedAt">--</span>
     </div>
   </section>
 
   <button onclick="loadWeather()">更新する</button>
 
   <section class="card">
-    <div class="label">今後24時間</div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>時刻</th>
-            <th>天気</th>
-            <th>気温</th>
-            <th>降水確率</th>
-            <th>風速</th>
-            <th>突風</th>
-            <th>風向</th>
-          </tr>
-        </thead>
-        <tbody id="forecastRows"></tbody>
-      </table>
+    <div class="label">今日のグラフ</div>
+
+    <div class="chart-card">
+      <div class="chart-title">気温 + 降水量</div>
+      <div class="chart-wrap">
+        <canvas id="tempRainChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">平均風速 + 突風</div>
+      <div class="chart-wrap">
+        <canvas id="windChart"></canvas>
+      </div>
     </div>
   </section>
 
   <section class="card">
-    <div class="label">3日予報</div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>日付</th>
-            <th>天気</th>
-            <th>最高</th>
-            <th>最低</th>
-            <th>降水確率</th>
-            <th>最大風速</th>
-            <th>最大突風</th>
-          </tr>
-        </thead>
-        <tbody id="dailyRows"></tbody>
-      </table>
-    </div>
+    <div class="label">今後24時間</div>
+    <table>
+      <thead>
+        <tr>
+          <th>時刻</th>
+          <th>風速</th>
+          <th>突風</th>
+        </tr>
+      </thead>
+      <tbody id="forecastRows"></tbody>
+    </table>
   </section>
 
   <footer>
     このアプリは外部気象データを利用した運用判断支援ツールです。
-    防災判断や営業停止判断には、気象庁などの公式情報も確認してください。
+    防災判断には気象庁などの公式情報を確認してください。
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <script>
-    // 御前崎市池新田付近の代表点
     const LAT = 34.647;
     const LON = 138.126;
 
-    function fmt(value, digits = 1) {
-      if (value === null || value === undefined || Number.isNaN(value)) return "--";
-      return Number(value).toFixed(digits);
-    }
+    let tempRainChart = null;
+    let windChart = null;
 
     function degToDir(deg) {
-      if (deg === null || deg === undefined) return "--";
       const dirs = [
         "北", "北北東", "北東", "東北東",
         "東", "東南東", "南東", "南南東",
         "南", "南南西", "南西", "西南西",
         "西", "西北西", "北西", "北北西"
       ];
+
       return dirs[Math.round(deg / 22.5) % 16];
+    }
+
+    function judgeRisk(wind, gust) {
+      if (gust >= 20 || wind >= 14) {
+        return { text: "停止推奨", cls: "stop" };
+      }
+      if (gust >= 15 || wind >= 10) {
+        return { text: "警戒", cls: "warning" };
+      }
+      if (gust >= 10 || wind >= 7) {
+        return { text: "注意", cls: "caution" };
+      }
+      return { text: "通常", cls: "normal" };
     }
 
     function weatherText(code) {
       const map = {
         0: "快晴",
-        1: "晴れ",
-        2: "一部曇り",
-        3: "曇り",
+        1: "晴",
+        2: "一部曇",
+        3: "曇",
         45: "霧",
         48: "霧氷",
         51: "弱い霧雨",
         53: "霧雨",
         55: "強い霧雨",
-        56: "弱い凍る霧雨",
-        57: "強い凍る霧雨",
         61: "弱い雨",
         63: "雨",
         65: "強い雨",
-        66: "弱い凍雨",
-        67: "強い凍雨",
         71: "弱い雪",
         73: "雪",
         75: "強い雪",
-        77: "雪粒",
         80: "弱いにわか雨",
         81: "にわか雨",
         82: "強いにわか雨",
-        85: "弱いにわか雪",
-        86: "強いにわか雪",
         95: "雷雨",
-        96: "雷雨・弱い雹",
-        99: "雷雨・強い雹"
+        96: "雷雨",
+        99: "強い雷雨"
       };
-      return map[code] || "不明";
-    }
 
-    function weatherIcon(code) {
-      if (code === 0) return "☀️";
-      if ([1, 2].includes(code)) return "🌤️";
-      if (code === 3) return "☁️";
-      if ([45, 48].includes(code)) return "🌫️";
-      if ([51, 53, 55, 56, 57].includes(code)) return "🌦️";
-      if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "🌧️";
-      if ([71, 73, 75, 77, 85, 86].includes(code)) return "❄️";
-      if ([95, 96, 99].includes(code)) return "⛈️";
-      return "🌡️";
-    }
-
-    function judgeRisk(wind, gust, rain, rainProb) {
-      // 現場向けに突風重視
-      if (gust >= 20 || wind >= 14 || (gust >= 15 && rainProb >= 80)) {
-        return {
-          text: "停止推奨",
-          cls: "stop",
-          note: "突風・強風リスクが高めです"
-        };
-      }
-
-      if (gust >= 15 || wind >= 10) {
-        return {
-          text: "強風警戒",
-          cls: "warning",
-          note: "ゴルフ・乗馬・屋外作業は要注意"
-        };
-      }
-
-      if (gust >= 10 || wind >= 7) {
-        return {
-          text: "風に注意",
-          cls: "caution",
-          note: "軽量物・ネット・看板を確認"
-        };
-      }
-
-      if (rain >= 1 || rainProb >= 60) {
-        return {
-          text: "雨に注意",
-          cls: "rain",
-          note: "降雨の可能性があります"
-        };
-      }
-
-      return {
-        text: "通常",
-        cls: "normal",
-        note: "大きな気象リスクは低め"
-      };
+      return map[code] || `天気${code}`;
     }
 
     function formatHour(iso) {
-      const d = new Date(iso);
-      return d.toLocaleString("ja-JP", {
-        month: "numeric",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-      });
+      const [, time] = iso.split("T");
+      const [hh] = time.split(":");
+      return `${Number(hh)}時`;
     }
 
-    function formatDate(isoDate) {
-      const d = new Date(isoDate + "T00:00:00");
-      return d.toLocaleDateString("ja-JP", {
-        month: "numeric",
-        day: "numeric",
-        weekday: "short"
-      });
+    function formatMonthDayHour(iso) {
+      const [date, time] = iso.split("T");
+      const [, m, d] = date.split("-");
+      const [hh] = time.split(":");
+      return `${Number(m)}/${Number(d)} ${Number(hh)}時`;
+    }
+
+    function nowJstDateString() {
+      const jst = new Date(Date.now() + 9 * 60 * 60 * 1000);
+      return jst.toISOString().slice(0, 10);
+    }
+
+    function currentJstHourIso() {
+      const jst = new Date(Date.now() + 9 * 60 * 60 * 1000);
+      jst.setUTCMinutes(0, 0, 0);
+      return jst.toISOString().slice(0, 13) + ":00";
     }
 
     function showError(message) {
@@ -457,147 +347,327 @@
       box.style.display = "block";
     }
 
-    function clearError() {
+    function hideError() {
       const box = document.getElementById("errorBox");
       box.textContent = "";
       box.style.display = "none";
     }
 
-    function findCurrentHourIndex(times) {
-      const now = new Date();
-      const margin = new Date(now.getTime() - 30 * 60 * 1000);
+    function gustClass(gust) {
+      if (gust >= 20) return "gust-red";
+      if (gust >= 15) return "gust-yellow";
+      return "";
+    }
 
-      const index = times.findIndex(t => new Date(t) >= margin);
-      return index >= 0 ? index : 0;
+    function gustLabel(gust) {
+      if (gust >= 20) return `🟥 ${gust.toFixed(1)}`;
+      if (gust >= 15) return `🟨 ${gust.toFixed(1)}`;
+      return gust.toFixed(1);
+    }
+
+    function buildTodayItems(hourly) {
+      const today = nowJstDateString();
+      const items = [];
+
+      for (let i = 0; i < hourly.time.length; i++) {
+        const t = hourly.time[i];
+
+        if (t.startsWith(today)) {
+          items.push({
+            time: t,
+            temp: hourly.temperature_2m[i],
+            rain: hourly.precipitation[i],
+            rainProb: hourly.precipitation_probability[i],
+            wind: hourly.wind_speed_10m[i],
+            gust: hourly.wind_gusts_10m[i]
+          });
+        }
+      }
+
+      return items;
+    }
+
+    function buildNext24Items(hourly) {
+      const startIso = currentJstHourIso();
+      const items = [];
+
+      for (let i = 0; i < hourly.time.length; i++) {
+        const t = hourly.time[i];
+
+        if (t >= startIso) {
+          items.push({
+            time: t,
+            wind: hourly.wind_speed_10m[i],
+            gust: hourly.wind_gusts_10m[i]
+          });
+        }
+
+        if (items.length >= 24) break;
+      }
+
+      return items;
+    }
+
+    function setChartDefaults() {
+      Chart.defaults.color = "#cbd5e1";
+      Chart.defaults.borderColor = "rgba(148, 163, 184, 0.25)";
+      Chart.defaults.font.family =
+        'system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif';
+    }
+
+    function renderTempRainChart(items) {
+      const canvas = document.getElementById("tempRainChart");
+      const labels = items.map(item => formatHour(item.time));
+
+      if (tempRainChart) {
+        tempRainChart.destroy();
+      }
+
+      tempRainChart = new Chart(canvas, {
+        data: {
+          labels,
+          datasets: [
+            {
+              type: "line",
+              label: "気温 ℃",
+              data: items.map(item => item.temp),
+              borderColor: "#f97316",
+              backgroundColor: "rgba(249, 115, 22, 0.15)",
+              yAxisID: "yTemp",
+              tension: 0.35,
+              pointRadius: 2
+            },
+            {
+              type: "bar",
+              label: "降水量 mm",
+              data: items.map(item => item.rain),
+              backgroundColor: "rgba(56, 189, 248, 0.65)",
+              borderColor: "#38bdf8",
+              yAxisID: "yRain"
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: "index",
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: "top",
+              labels: {
+                boxWidth: 12,
+                boxHeight: 12
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  if (context.dataset.yAxisID === "yTemp") {
+                    return `気温 ${Number(context.raw).toFixed(1)}℃`;
+                  }
+                  return `降水量 ${Number(context.raw).toFixed(1)}mm`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                maxTicksLimit: 8
+              }
+            },
+            yTemp: {
+              type: "linear",
+              position: "left",
+              title: {
+                display: true,
+                text: "℃"
+              }
+            },
+            yRain: {
+              type: "linear",
+              position: "right",
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: "mm"
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderWindChart(items) {
+      const canvas = document.getElementById("windChart");
+      const labels = items.map(item => formatHour(item.time));
+
+      if (windChart) {
+        windChart.destroy();
+      }
+
+      windChart = new Chart(canvas, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "平均風速 m/s",
+              data: items.map(item => item.wind),
+              borderColor: "#38bdf8",
+              backgroundColor: "rgba(56, 189, 248, 0.15)",
+              tension: 0.35,
+              pointRadius: 2
+            },
+            {
+              label: "突風 m/s",
+              data: items.map(item => item.gust),
+              borderColor: "#facc15",
+              backgroundColor: "rgba(250, 204, 21, 0.12)",
+              tension: 0.35,
+              pointRadius: 2
+            },
+            {
+              label: "警戒 15m/s",
+              data: items.map(() => 15),
+              borderColor: "rgba(250, 204, 21, 0.8)",
+              borderDash: [6, 6],
+              pointRadius: 0
+            },
+            {
+              label: "停止目安 20m/s",
+              data: items.map(() => 20),
+              borderColor: "rgba(248, 113, 113, 0.85)",
+              borderDash: [6, 6],
+              pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: "index",
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: "top",
+              labels: {
+                boxWidth: 12,
+                boxHeight: 12
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label} ${Number(context.raw).toFixed(1)}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                maxTicksLimit: 8
+              }
+            },
+            y: {
+              beginAtZero: true,
+              suggestedMax: 25,
+              title: {
+                display: true,
+                text: "m/s"
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderForecastTable(items) {
+      const rows = document.getElementById("forecastRows");
+      rows.innerHTML = "";
+
+      for (const item of items) {
+        const tr = document.createElement("tr");
+        const cls = gustClass(item.gust);
+
+        tr.innerHTML = `
+          <td>${formatMonthDayHour(item.time)}</td>
+          <td>
+            ${item.wind.toFixed(1)}
+            <div class="bar-wrap">
+              <div class="bar" style="width:${Math.min(item.wind / 20 * 100, 100)}%"></div>
+            </div>
+          </td>
+          <td class="${cls}">${gustLabel(item.gust)}</td>
+        `;
+
+        rows.appendChild(tr);
+      }
     }
 
     async function loadWeather() {
-      clearError();
-
-      const url =
-        "https://api.open-meteo.com/v1/forecast" +
-        `?latitude=${LAT}` +
-        `&longitude=${LON}` +
-        "&current=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m" +
-        "&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m" +
-        "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max" +
-        "&wind_speed_unit=ms" +
-        "&timezone=Asia%2FTokyo" +
-        "&forecast_days=3";
+      hideError();
 
       try {
+        const url =
+          `https://api.open-meteo.com/v1/forecast` +
+          `?latitude=${LAT}&longitude=${LON}` +
+          `&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
+          `&hourly=temperature_2m,precipitation,precipitation_probability,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
+          `&wind_speed_unit=ms` +
+          `&timezone=Asia%2FTokyo` +
+          `&forecast_days=3`;
+
         const res = await fetch(url);
 
         if (!res.ok) {
-          throw new Error("天気データの取得に失敗しました");
+          throw new Error(`Open-Meteo API error: ${res.status}`);
         }
 
         const data = await res.json();
 
-        const current = data.current;
-        const hourly = data.hourly;
-        const daily = data.daily;
+        const wind = data.current.wind_speed_10m;
+        const gust = data.current.wind_gusts_10m;
+        const dir = data.current.wind_direction_10m;
+        const temp = data.current.temperature_2m;
+        const weather = data.current.weather_code;
 
-        const wind = current.wind_speed_10m;
-        const gust = current.wind_gusts_10m;
-        const dir = current.wind_direction_10m;
-        const temp = current.temperature_2m;
-        const feels = current.apparent_temperature;
-        const rain = current.precipitation;
-        const wcode = current.weather_code;
-
-        const startIndex = findCurrentHourIndex(hourly.time);
-        const next24End = Math.min(startIndex + 24, hourly.time.length);
-
-        const next24Gusts = hourly.wind_gusts_10m.slice(startIndex, next24End);
-        const next24Temps = hourly.temperature_2m.slice(startIndex, next24End);
-        const next24RainProb = hourly.precipitation_probability.slice(startIndex, next24End);
-
-        const maxGust24 = Math.max(...next24Gusts);
-        const maxTemp24 = Math.max(...next24Temps);
-        const maxRainProb24 = Math.max(...next24RainProb);
-
-        const risk = judgeRisk(wind, gust, rain, maxRainProb24);
-
-        document.getElementById("currentWeatherIcon").textContent = weatherIcon(wcode);
-        document.getElementById("largeWeatherIcon").textContent = weatherIcon(wcode);
-        document.getElementById("currentWeather").textContent = weatherText(wcode);
-
-        document.getElementById("currentTemp").textContent = fmt(temp);
-        document.getElementById("currentFeels").textContent = fmt(feels);
-        document.getElementById("currentWind").textContent = fmt(wind);
-        document.getElementById("currentGust").textContent = fmt(gust);
+        document.getElementById("currentWind").textContent = wind.toFixed(1);
+        document.getElementById("currentGust").textContent = gust.toFixed(1);
         document.getElementById("currentDir").textContent = degToDir(dir);
-        document.getElementById("currentRain").textContent = fmt(rain);
-
-        document.getElementById("maxGust24").textContent = fmt(maxGust24);
-        document.getElementById("maxTemp24").textContent = fmt(maxTemp24);
-        document.getElementById("maxRainProb24").textContent = fmt(maxRainProb24, 0);
-
-        document.getElementById("forecastTime").textContent = current.time;
+        document.getElementById("currentTemp").textContent = temp.toFixed(1);
+        document.getElementById("currentWeather").textContent = weatherText(weather);
         document.getElementById("updatedAt").textContent =
           new Date().toLocaleString("ja-JP");
 
+        const risk = judgeRisk(wind, gust);
         const riskBox = document.getElementById("riskBox");
-        riskBox.textContent = `${risk.text}：${risk.note}`;
+        riskBox.textContent = risk.text;
         riskBox.className = `risk ${risk.cls}`;
 
-        // 24時間予報
-        const rows = document.getElementById("forecastRows");
-        rows.innerHTML = "";
+        const todayItems = buildTodayItems(data.hourly);
+        const next24Items = buildNext24Items(data.hourly);
 
-        for (let i = startIndex; i < next24End; i++) {
-          const t = hourly.time[i];
-          const tempH = hourly.temperature_2m[i];
-          const rainProb = hourly.precipitation_probability[i];
-          const codeH = hourly.weather_code[i];
-          const windH = hourly.wind_speed_10m[i];
-          const gustH = hourly.wind_gusts_10m[i];
-          const dirH = hourly.wind_direction_10m[i];
+        setChartDefaults();
+        renderTempRainChart(todayItems);
+        renderWindChart(todayItems);
+        renderForecastTable(next24Items);
 
-          const tr = document.createElement("tr");
-
-          tr.innerHTML = `
-            <td>${formatHour(t)}</td>
-            <td>${weatherIcon(codeH)} ${weatherText(codeH)}</td>
-            <td>${fmt(tempH)}℃</td>
-            <td>${fmt(rainProb, 0)}%</td>
-            <td>
-              ${fmt(windH)}
-              <div class="bar-wrap">
-                <div class="bar" style="width:${Math.min(windH / 20 * 100, 100)}%"></div>
-              </div>
-            </td>
-            <td>${fmt(gustH)}</td>
-            <td>${degToDir(dirH)}</td>
-          `;
-
-          rows.appendChild(tr);
-        }
-
-        // 3日予報
-        const dailyRows = document.getElementById("dailyRows");
-        dailyRows.innerHTML = "";
-
-        for (let i = 0; i < daily.time.length; i++) {
-          const tr = document.createElement("tr");
-
-          tr.innerHTML = `
-            <td>${formatDate(daily.time[i])}</td>
-            <td>${weatherIcon(daily.weather_code[i])} ${weatherText(daily.weather_code[i])}</td>
-            <td>${fmt(daily.temperature_2m_max[i])}℃</td>
-            <td>${fmt(daily.temperature_2m_min[i])}℃</td>
-            <td>${fmt(daily.precipitation_probability_max[i], 0)}%</td>
-            <td>${fmt(daily.wind_speed_10m_max[i])}</td>
-            <td>${fmt(daily.wind_gusts_10m_max[i])}</td>
-          `;
-
-          dailyRows.appendChild(tr);
-        }
-
-      } catch (error) {
-        console.error(error);
-        showError("データを取得できませんでした。通信状況を確認して、もう一度更新してください。");
+      } catch (err) {
+        console.error(err);
+        showError(
+          "天気データの取得に失敗しました。時間をおいて再読み込みしてください。\n" +
+          String(err.message || err)
+        );
       }
     }
 
