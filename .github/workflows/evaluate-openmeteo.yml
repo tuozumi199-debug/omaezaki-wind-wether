@@ -1,0 +1,52 @@
+name: Evaluate Open-Meteo
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 毎週月曜 05:00 JST
+    # UTCでは日曜 20:00
+    - cron: "0 20 * * 0"
+
+permissions:
+  contents: write
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run evaluation
+        run: node scripts/evaluate-openmeteo.mjs
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openmeteo-evaluation
+          path: |
+            reports/openmeteo-evaluation.md
+            reports/openmeteo-evaluation-daily.csv
+            reports/openmeteo-evaluation-summary.json
+
+      - name: Commit reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add reports/openmeteo-evaluation.md
+          git add reports/openmeteo-evaluation-daily.csv
+          git add reports/openmeteo-evaluation-summary.json
+
+          if git diff --cached --quiet; then
+            echo "No report changes."
+          else
+            git commit -m "Update Open-Meteo evaluation report"
+            git push
+          fi
