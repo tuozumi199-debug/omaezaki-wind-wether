@@ -384,7 +384,7 @@ function compactForecastLines(item, includeDate = false) {
 
   return [
     `${prefix}気温${fmt(item.temp)}℃ / 降水${fmt(item.rainProb, 0)}%`,
-    `${indentForPrefix(prefix)}風速${fmt(item.wind)}m/s / ${gustDisplay(item)}`
+    `${indentForPrefix(prefix)} 風速${fmt(item.wind)}m/s ${gustDisplay(item)}`
   ];
 }
 
