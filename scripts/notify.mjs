@@ -29,6 +29,10 @@ function fmt(value, digits = 1) {
   return Number(value).toFixed(digits);
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function nowJstFakeDate() {
   return new Date(Date.now() + 9 * 60 * 60 * 1000);
 }
@@ -205,13 +209,41 @@ async function fetchWeather() {
     "&timezone=Asia%2FTokyo" +
     "&forecast_days=3";
 
-  const res = await fetch(url);
+  const maxRetries = 4;
 
-  if (!res.ok) {
-    throw new Error(`Open-Meteo API error: ${res.status}`);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Open-Meteo取得試行 ${attempt}/${maxRetries}`);
+
+      const res = await fetch(url, {
+        headers: {
+          "User-Agent": "omaezaki-wind-alert/1.0"
+        }
+      });
+
+      if (res.ok) {
+        return await res.json();
+      }
+
+      console.log(`Open-Meteo status: ${res.status}`);
+
+      // 一時的なエラーだけリトライ
+      if (![429, 502, 503, 504].includes(res.status)) {
+        throw new Error(`Open-Meteo API error: ${res.status}`);
+      }
+
+    } catch (err) {
+      console.log(`Open-Meteo取得失敗: ${err.message}`);
+    }
+
+    if (attempt < maxRetries) {
+      const waitMs = attempt * 5000;
+      console.log(`${waitMs / 1000}秒待って再試行します`);
+      await sleep(waitMs);
+    }
   }
 
-  return res.json();
+  throw new Error(`Open-Meteo API error: retry failed after ${maxRetries} attempts`);
 }
 
 function buildHourlyItems(data, startIso, endIso) {
