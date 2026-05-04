@@ -23,6 +23,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare state directory
+        run: |
+          mkdir -p .cache
+          touch .cache/.keep
+
+      - name: Restore notification state
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache
+          key: wind-state-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            wind-state-
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -44,3 +57,10 @@ jobs:
 
           echo "mode=$MODE"
           node scripts/notify.mjs "$MODE"
+
+      - name: Save notification state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .cache
+          key: wind-state-${{ github.run_id }}-${{ github.run_attempt }}
