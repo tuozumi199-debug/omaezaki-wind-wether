@@ -114,6 +114,41 @@ function weatherText(code) {
   return map[code] || `天気コード ${code}`;
 }
 
+function shortWeatherText(code) {
+  const text = weatherText(code);
+
+  const map = {
+    "快晴": "快晴",
+    "晴れ": "晴",
+    "一部曇り": "一部曇",
+    "曇り": "曇",
+    "霧": "霧",
+    "霧氷": "霧氷",
+    "弱い霧雨": "弱霧雨",
+    "霧雨": "霧雨",
+    "強い霧雨": "強霧雨",
+    "弱い雨": "弱雨",
+    "雨": "雨",
+    "強い雨": "強雨",
+    "弱い凍雨": "弱凍雨",
+    "強い凍雨": "強凍雨",
+    "弱い雪": "弱雪",
+    "雪": "雪",
+    "強い雪": "強雪",
+    "雪粒": "雪粒",
+    "弱いにわか雨": "弱にわか雨",
+    "にわか雨": "にわか雨",
+    "強いにわか雨": "強にわか雨",
+    "弱いにわか雪": "弱にわか雪",
+    "強いにわか雪": "強にわか雪",
+    "雷雨": "雷雨",
+    "雷雨・弱い雹": "雷雨",
+    "雷雨・強い雹": "強雷雨"
+  };
+
+  return map[text] || text;
+}
+
 function weatherIcon(code) {
   if (code === 0) return "☀️";
   if ([1, 2].includes(code)) return "🌤️";
@@ -221,10 +256,52 @@ function summarize(items) {
   };
 }
 
+function dateLabelForList(iso) {
+  if (!iso) return "--";
+
+  const [date] = iso.split("T");
+  const [, m, d] = date.split("-");
+
+  return `${Number(m)}/${Number(d)}`;
+}
+
+function timeLabelForList(iso) {
+  if (!iso) return "--";
+
+  const [, time] = iso.split("T");
+  const [hh, mm] = time.split(":");
+
+  return `${Number(hh)}:${mm}`;
+}
+
 function buildHourlyList(items) {
-  return items.map(item => {
-    return `${displayTime(item.time)} ${weatherIcon(item.code)} ${weatherText(item.code)}｜気${fmt(item.temp)}℃｜降${fmt(item.rainProb, 0)}%｜風${fmt(item.wind)}/突${fmt(item.gust)}m/s｜${degToDir(item.dir)}`;
-  });
+  const lines = [];
+  let currentDateLabel = "";
+
+  for (const item of items) {
+    const dateLabel = dateLabelForList(item.time);
+
+    // 日付が変わったタイミングだけ日付行を入れる
+    if (dateLabel !== currentDateLabel) {
+      lines.push(`${dateLabel}`);
+      currentDateLabel = dateLabel;
+    }
+
+    const timeLabel = timeLabelForList(item.time);
+    const weather = shortWeatherText(item.code);
+
+    lines.push(`${timeLabel} ${weather}`);
+    lines.push(`　　気温${fmt(item.temp)}℃ / 降水${fmt(item.rainProb, 0)}%`);
+    lines.push(`　　${fmt(item.wind)}m/s（突風${fmt(item.gust)}m/s）`);
+    lines.push("");
+  }
+
+  // 最後の空行を削除
+  if (lines[lines.length - 1] === "") {
+    lines.pop();
+  }
+
+  return lines;
 }
 
 function buildMessage({
@@ -258,7 +335,6 @@ function buildMessage({
   if (includeHourlyList) {
     lines.push("");
     lines.push("【時間別一覧】");
-    lines.push("時刻 天気｜気温｜降水｜風速/突風｜風向");
     lines.push(...buildHourlyList(items));
   }
 
@@ -355,7 +431,7 @@ async function main() {
     Number(s.peakGust?.gust ?? 0) >= WARNING_GUST ||
     Number(s.peakWind?.wind ?? 0) >= WARNING_WIND;
 
-  // daily、つまり16時レポートのときだけ時間別一覧を付ける
+  // 16時レポートのときだけ時間別一覧を付ける
   const includeHourlyList = mode === "daily";
 
   if (!shouldAlert) {
