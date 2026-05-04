@@ -1,0 +1,46 @@
+name: Wind Alert
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "check / daily / test"
+        required: false
+        default: "test"
+
+  schedule:
+    # 1時間ごとに強風チェック
+    - cron: "5 * * * *"
+
+    # 毎日16:00 JST = 07:00 UTC
+    - cron: "0 7 * * *"
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run wind notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          MODE="${{ github.event.inputs.mode || '' }}"
+
+          if [ -z "$MODE" ]; then
+            if [ "${{ github.event.schedule }}" = "0 7 * * *" ]; then
+              MODE="daily"
+            else
+              MODE="check"
+            fi
+          fi
+
+          echo "mode=$MODE"
+          node scripts/notify.mjs "$MODE"
