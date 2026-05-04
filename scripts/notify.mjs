@@ -229,14 +229,14 @@ function gustDisplay(item) {
   const gust = Number(item?.gust ?? 0);
 
   if (gust >= STOP_GUST) {
-    return `🟥 **突風${fmt(item.gust)}m/s**`;
+    return `(🟥 ${fmt(item.gust)}m/s)`;
   }
 
   if (gust >= WARNING_GUST) {
-    return `🟨 **突風${fmt(item.gust)}m/s**`;
+    return `(🟨 ${fmt(item.gust)}m/s)`;
   }
 
-  return `突風${fmt(item.gust)}m/s`;
+  return `(突風${fmt(item.gust)}m/s)`;
 }
 
 async function fetchWeather() {
@@ -270,7 +270,6 @@ async function fetchWeather() {
       if (![429, 502, 503, 504].includes(res.status)) {
         throw new Error(`Open-Meteo API error: ${res.status}`);
       }
-
     } catch (err) {
       console.log(`Open-Meteo取得失敗: ${err.message}`);
     }
@@ -343,9 +342,9 @@ function timeLabelForList(iso) {
   if (!iso) return "--";
 
   const [, time] = iso.split("T");
-  const [hh, mm] = time.split(":");
+  const [hh] = time.split(":");
 
-  return `${Number(hh)}:${mm}`;
+  return `${Number(hh)}時`;
 }
 
 function padRightChars(text, targetLength, spaceChar = " ") {
@@ -375,18 +374,17 @@ function indentForPrefix(prefix) {
 function compactForecastLines(item, includeDate = false) {
   const datePrefix = includeDate ? `${dateLabelForList(item.time)} ` : "";
 
-  // 時刻は 16:00 と 0:00 でズレないように5文字幅にする
-  const timeLabel = padRightChars(timeLabelForList(item.time), 5, " ");
+  // 「21時」「0時」などでズレにくいように3文字幅
+  const timeLabel = padRightChars(timeLabelForList(item.time), 3, " ");
 
-  // 天気は「晴」「一部曇」「にわか雨」などで気温位置がズレないように5文字幅にする
-  const weather = padRightChars(shortWeatherText(item.code), 5, "　");
+  // 天気は「晴」「一部曇」などで気温位置がズレないように4文字幅
+  const weather = padRightChars(shortWeatherText(item.code), 4, "　");
 
-  // ここまでが「気温」の前に来る部分
   const prefix = `${datePrefix}${timeLabel} ${weather}`;
 
   return [
     `${prefix}気温${fmt(item.temp)}℃ / 降水${fmt(item.rainProb, 0)}%`,
-    `${indentForPrefix(prefix)}平均風速${fmt(item.wind)}m/s（${gustDisplay(item)}）`
+    `${indentForPrefix(prefix)}　風速${fmt(item.wind)}m/s / ${gustDisplay(item)}`
   ];
 }
 
@@ -424,11 +422,6 @@ function buildHourlyList(items) {
     }
 
     lines.push(...compactForecastLines(item, false));
-    lines.push("");
-  }
-
-  if (lines[lines.length - 1] === "") {
-    lines.pop();
   }
 
   return lines;
