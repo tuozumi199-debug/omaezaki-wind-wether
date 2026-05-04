@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
+
 const LAT = 34.647;
 const LON = 138.126;
 const PLACE = "御前崎・池新田";
@@ -11,6 +14,10 @@ const WARNING_GUST = 15;        // 突風 m/s：強風警戒
 const STOP_GUST = 20;           // 突風 m/s：停止推奨
 const WARNING_WIND = 10;        // 平均風速 m/s：強風警戒
 const STOP_WIND = 14;           // 平均風速 m/s：停止推奨
+
+// ===== 通知重複抑制用 =====
+const STATE_DIR = ".cache";
+const STATE_FILE = path.join(STATE_DIR, "wind-alert-state.json");
 
 const mode = process.argv[2] || "check";
 const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
@@ -31,6 +38,25 @@ function fmt(value, digits = 1) {
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function ensureStateDir() {
+  fs.mkdirSync(STATE_DIR, { recursive: true });
+}
+
+function readState() {
+  try {
+    if (!fs.existsSync(STATE_FILE)) return {};
+    return JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
+  } catch (err) {
+    console.log(`状態ファイルの読み込みに失敗しました: ${err.message}`);
+    return {};
+  }
+}
+
+function writeState(state) {
+  ensureStateDir();
+  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), "utf8");
 }
 
 function nowJstFakeDate() {
@@ -183,20 +209,34 @@ function maxOf(items, field) {
   return best;
 }
 
-function riskLabel(maxGust, maxWind) {
+function riskInfo(maxGust, maxWind) {
   if (maxGust >= STOP_GUST || maxWind >= STOP_WIND) {
-    return "🟣 停止推奨";
+    return { label: "🟣 停止推奨", level: 3 };
   }
 
   if (maxGust >= WARNING_GUST || maxWind >= WARNING_WIND) {
-    return "🔴 強風警戒";
+    return { label: "🔴 強風警戒", level: 2 };
   }
 
   if (maxGust >= 10 || maxWind >= 7) {
-    return "🟡 風に注意";
+    return { label: "🟡 風に注意", level: 1 };
   }
 
-  return "🟢 通常";
+  return { label: "🟢 通常", level: 0 };
+}
+
+function gustDisplay(item) {
+  const gust = Number(item?.gust ?? 0);
+
+  if (gust >= STOP_GUST) {
+    return `🟥 **突風${fmt(item.gust)}m/s**`;
+  }
+
+  if (gust >= WARNING_GUST) {
+    return `🟨 **突風${fmt(item.gust)}m/s**`;
+  }
+
+  return `突風${fmt(item.gust)}m/s`;
 }
 
 async function fetchWeather() {
@@ -227,7 +267,6 @@ async function fetchWeather() {
 
       console.log(`Open-Meteo status: ${res.status}`);
 
-      // 一時的なエラーだけリトライ
       if (![429, 502, 503, 504].includes(res.status)) {
         throw new Error(`Open-Meteo API error: ${res.status}`);
       }
@@ -276,15 +315,18 @@ function summarize(items) {
   const peakRainProb = maxOf(items, "rainProb");
   const peakTemp = maxOf(items, "temp");
 
+  const risk = riskInfo(
+    Number(peakGust?.gust ?? 0),
+    Number(peakWind?.wind ?? 0)
+  );
+
   return {
     peakGust,
     peakWind,
     peakRainProb,
     peakTemp,
-    label: riskLabel(
-      Number(peakGust?.gust ?? 0),
-      Number(peakWind?.wind ?? 0)
-    )
+    label: risk.label,
+    level: risk.level
   };
 }
 
@@ -306,6 +348,69 @@ function timeLabelForList(iso) {
   return `${Number(hh)}:${mm}`;
 }
 
+function padRightChars(text, targetLength, spaceChar = " ") {
+  const chars = [...String(text)];
+  const diff = targetLength - chars.length;
+
+  if (diff <= 0) return String(text);
+
+  return String(text) + spaceChar.repeat(diff);
+}
+
+function indentForPrefix(prefix) {
+  let result = "";
+
+  for (const char of [...String(prefix)]) {
+    // 半角文字は半角スペース、全角文字は全角スペースに置き換える
+    if (char.match(/[ -~]/)) {
+      result += " ";
+    } else {
+      result += "　";
+    }
+  }
+
+  return result;
+}
+
+function compactForecastLines(item, includeDate = false) {
+  const datePrefix = includeDate ? `${dateLabelForList(item.time)} ` : "";
+
+  // 時刻は 16:00 と 0:00 でズレないように5文字幅にする
+  const timeLabel = padRightChars(timeLabelForList(item.time), 5, " ");
+
+  // 天気は「晴」「一部曇」「にわか雨」などで気温位置がズレないように5文字幅にする
+  const weather = padRightChars(shortWeatherText(item.code), 5, "　");
+
+  // ここまでが「気温」の前に来る部分
+  const prefix = `${datePrefix}${timeLabel} ${weather}`;
+
+  return [
+    `${prefix}気温${fmt(item.temp)}℃ / 降水${fmt(item.rainProb, 0)}%`,
+    `${indentForPrefix(prefix)}平均風速${fmt(item.wind)}m/s（${gustDisplay(item)}）`
+  ];
+}
+
+function buildPeakHighlights(items, summary) {
+  const lines = [];
+
+  if (summary.peakGust) {
+    lines.push("最大突風の時間：");
+    lines.push(...compactForecastLines(summary.peakGust, true));
+  }
+
+  if (
+    summary.peakWind &&
+    summary.peakGust &&
+    summary.peakWind.time !== summary.peakGust.time
+  ) {
+    lines.push("");
+    lines.push("最大風速の時間：");
+    lines.push(...compactForecastLines(summary.peakWind, true));
+  }
+
+  return lines;
+}
+
 function buildHourlyList(items) {
   const lines = [];
   let currentDateLabel = "";
@@ -313,27 +418,63 @@ function buildHourlyList(items) {
   for (const item of items) {
     const dateLabel = dateLabelForList(item.time);
 
-    // 日付が変わったタイミングだけ日付行を入れる
     if (dateLabel !== currentDateLabel) {
       lines.push(`${dateLabel}`);
       currentDateLabel = dateLabel;
     }
 
-    const timeLabel = timeLabelForList(item.time);
-    const weather = shortWeatherText(item.code);
-
-    lines.push(`${timeLabel} ${weather}`);
-    lines.push(`　　気温${fmt(item.temp)}℃ / 降水${fmt(item.rainProb, 0)}%`);
-    lines.push(`　　${fmt(item.wind)}m/s（突風${fmt(item.gust)}m/s）`);
+    lines.push(...compactForecastLines(item, false));
     lines.push("");
   }
 
-  // 最後の空行を削除
   if (lines[lines.length - 1] === "") {
     lines.pop();
   }
 
   return lines;
+}
+
+function buildCheckSignature(summary) {
+  return [
+    `level:${summary.level}`,
+    `gust:${summary.peakGust?.time ?? "none"}`,
+    `wind:${summary.peakWind?.time ?? "none"}`
+  ].join("|");
+}
+
+function isDuplicateCheckAlert(summary) {
+  if (mode !== "check") return false;
+
+  const state = readState();
+  const previous = state.lastCheckAlert;
+  const signature = buildCheckSignature(summary);
+
+  if (!previous) return false;
+
+  return (
+    previous.signature === signature &&
+    Number(previous.riskLevel ?? 0) >= Number(summary.level ?? 0)
+  );
+}
+
+function saveCheckAlertState(summary) {
+  if (mode !== "check") return;
+
+  const state = readState();
+  const signature = buildCheckSignature(summary);
+
+  state.lastCheckAlert = {
+    signature,
+    riskLevel: summary.level,
+    label: summary.label,
+    peakGustTime: summary.peakGust?.time ?? null,
+    peakGust: summary.peakGust?.gust ?? null,
+    peakWindTime: summary.peakWind?.time ?? null,
+    peakWind: summary.peakWind?.wind ?? null,
+    notifiedAt: nowJstIsoMinute()
+  };
+
+  writeState(state);
 }
 
 function buildMessage({
@@ -365,6 +506,9 @@ function buildMessage({
   ].filter(Boolean);
 
   if (includeHourlyList) {
+    lines.push("");
+    lines.push("【ピーク時間】");
+    lines.push(...buildPeakHighlights(items, s));
     lines.push("");
     lines.push("【時間別一覧】");
     lines.push(...buildHourlyList(items));
@@ -424,6 +568,8 @@ async function postDiscord(content) {
 }
 
 async function main() {
+  ensureStateDir();
+
   const data = await fetchWeather();
 
   let startIso;
@@ -463,7 +609,6 @@ async function main() {
     Number(s.peakGust?.gust ?? 0) >= WARNING_GUST ||
     Number(s.peakWind?.wind ?? 0) >= WARNING_WIND;
 
-  // 16時レポートのときだけ時間別一覧を付ける
   const includeHourlyList = mode === "daily";
 
   if (!shouldAlert) {
@@ -479,6 +624,12 @@ async function main() {
     return;
   }
 
+  if (isDuplicateCheckAlert(s)) {
+    console.log("同じピークのため、毎時通知を抑制しました");
+    console.log(`signature=${buildCheckSignature(s)}`);
+    return;
+  }
+
   const message = buildMessage({
     title,
     startIso,
@@ -489,6 +640,7 @@ async function main() {
   });
 
   await postDiscord(message);
+  saveCheckAlertState(s);
   console.log("Discordへ通知しました");
 }
 
