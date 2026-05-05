@@ -7,7 +7,6 @@ const CONFIG = {
   jmaStationUrlBase: "https://www.data.jma.go.jp/stats/etrn/view/daily_s1.php",
 
   // 御前崎特別地域気象観測所付近
-  // 気象庁資料: 34°36.2′N / 138°12.8′E
   latitude: Number(process.env.EVAL_LAT ?? 34.603333),
   longitude: Number(process.env.EVAL_LON ?? 138.213333),
 
@@ -78,7 +77,7 @@ async function fetchWithRetry(url, options = {}) {
       const res = await fetch(url, {
         ...options,
         headers: {
-          "User-Agent": "omaezaki-openmeteo-evaluator/1.0",
+          "User-Agent": "omaezaki-openmeteo-evaluator/1.1",
           ...(options.headers ?? {}),
         },
       });
@@ -104,6 +103,7 @@ async function fetchText(url) {
   const res = await fetchWithRetry(url);
   const buffer = await res.arrayBuffer();
 
+  // 気象庁ページは基本UTF-8で読めるが、念のためfallback
   try {
     return new TextDecoder("utf-8", { fatal: false }).decode(buffer);
   } catch {
@@ -112,7 +112,7 @@ async function fetchText(url) {
 }
 
 function decodeHtml(text) {
-  return text
+  return String(text ?? "")
     .replace(/&nbsp;/g, " ")
     .replace(/&#160;/g, " ")
     .replace(/&amp;/g, "&")
@@ -124,7 +124,7 @@ function decodeHtml(text) {
 
 function stripTags(html) {
   return decodeHtml(
-    html
+    String(html ?? "")
       .replace(/<br\s*\/?>/gi, " ")
       .replace(/<[^>]*>/g, " ")
       .replace(/\s+/g, " ")
@@ -132,31 +132,72 @@ function stripTags(html) {
   );
 }
 
+function extractTableCells(rowHtml) {
+  const cells = [];
+  const cellRegex = /<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi;
+  let match;
+
+  while ((match = cellRegex.exec(rowHtml)) !== null) {
+    cells.push(stripTags(match[1]));
+  }
+
+  return cells;
+}
+
+function normalizeJmaDayCell(text) {
+  const m = String(text ?? "").match(/\d{1,2}/);
+  return m ? Number(m[0]) : null;
+}
+
 function parseNumToken(token) {
   if (token == null) return null;
 
-  const cleaned = String(token)
+  const text = stripTags(String(token)).trim();
+
+  if (!text) return null;
+
+  // 15:17 のような時刻を風速として読まない
+  if (/^\d{1,2}:\d{2}$/.test(text)) return null;
+
+  // 気象庁の注記記号 ), ], * などを無視して、最初の数値だけ読む
+  const match = text
     .replace(/[−ー]/g, "-")
-    .replace(/[^0-9.\-]/g, "");
+    .match(/-?\d+(?:\.\d+)?/);
 
-  if (!cleaned || cleaned === "-" || cleaned === ".") return null;
+  if (!match) return null;
 
-  const n = Number(cleaned);
-  return Number.isFinite(n) ? n : null;
+  const n = Number(match[0]);
+
+  if (!Number.isFinite(n)) return null;
+
+  return n;
 }
 
 function parseTimeToken(token) {
   if (!token) return null;
 
-  const m = String(token).match(/^(\d{1,2}):(\d{2})$/);
+  const text = stripTags(String(token)).trim();
+  const m = text.match(/^(\d{1,2}):(\d{2})$/);
+
   if (!m) return null;
 
   const hh = Number(m[1]);
   const mm = Number(m[2]);
 
+  if (hh === 24 && mm === 0) return "24:00";
   if (hh < 0 || hh > 23 || mm < 0 || mm > 59) return null;
 
   return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+}
+
+function plausibleWind(value) {
+  if (value == null) return null;
+  if (!Number.isFinite(value)) return null;
+
+  // 100m/s超は、御前崎の通常評価では明らかにパース異常
+  if (value < 0 || value > 100) return null;
+
+  return value;
 }
 
 function parseJmaDailyWindHtml(html, year, month) {
@@ -165,22 +206,35 @@ function parseJmaDailyWindHtml(html, year, month) {
   let match;
 
   while ((match = trRegex.exec(html)) !== null) {
-    const text = stripTags(match[1]);
-    const tokens = text.split(" ").filter(Boolean);
-    const day = Number(tokens[0]);
+    const cells = extractTableCells(match[1]);
+
+    // 必要列が足りない行は無視
+    if (cells.length < 8) continue;
+
+    const day = normalizeJmaDayCell(cells[0]);
 
     if (!Number.isInteger(day) || day < 1 || day > 31) continue;
 
-    // daily_s1.php?view=a4 の「詳細（風・日照・雪・その他）」想定
-    // 日, 平均風速, 最大風速, 最大風速の風向, 最大風速の時分,
-    // 最大瞬間風速, 最大瞬間風速の風向, 最大瞬間風速の時分, 最多風向, ...
-    const avgWind = parseNumToken(tokens[1]);
-    const maxWind = parseNumToken(tokens[2]);
-    const maxWindDir = tokens[3] ?? "";
-    const maxWindTime = parseTimeToken(tokens[4]);
-    const maxGust = parseNumToken(tokens[5]);
-    const maxGustDir = tokens[6] ?? "";
-    const maxGustTime = parseTimeToken(tokens[7]);
+    // view=a3 の列構成
+    // 0: 日
+    // 1: 平均風速
+    // 2: 最大風速 風速
+    // 3: 最大風速 風向
+    // 4: 最大風速 時分
+    // 5: 最大瞬間風速 風速
+    // 6: 最大瞬間風速 風向
+    // 7: 最大瞬間風速 時分
+    // 8: 最多風向
+    // 以降: 日照・雪・雲量・天気概況など
+
+    const avgWind = plausibleWind(parseNumToken(cells[1]));
+    const maxWind = plausibleWind(parseNumToken(cells[2]));
+    const maxWindDir = cells[3] ?? "";
+    const maxWindTime = parseTimeToken(cells[4]);
+
+    const maxGust = plausibleWind(parseNumToken(cells[5]));
+    const maxGustDir = cells[6] ?? "";
+    const maxGustTime = parseTimeToken(cells[7]);
 
     const date = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
@@ -212,7 +266,7 @@ async function fetchJmaDailyWind(startDate, endDate) {
       `&year=${year}` +
       `&month=${month}` +
       `&day=` +
-      `&view=a4`;
+      `&view=a3`;
 
     console.log(`JMA: ${year}-${String(month).padStart(2, "0")}`);
 
@@ -335,6 +389,10 @@ function aggregateOpenMeteoDaily(hourly) {
     const maxWind = maxWithTime(items, "wind");
     const maxGust = maxWithTime(items, "gust");
 
+    const precipitationValues = items
+      .map((x) => x.precipitation)
+      .filter((v) => Number.isFinite(v));
+
     rows.push({
       date,
       omAvgWind: mean(items.map((x) => x.wind)),
@@ -343,10 +401,7 @@ function aggregateOpenMeteoDaily(hourly) {
       omMaxGust: maxGust?.value ?? null,
       omMaxGustTime: maxGust?.time?.slice(11, 16) ?? null,
       omAvgTemp: mean(items.map((x) => x.temp)),
-      omPrecipitationTotal: items
-        .map((x) => x.precipitation)
-        .filter((v) => Number.isFinite(v))
-        .reduce((a, b) => a + b, 0),
+      omPrecipitationTotal: precipitationValues.reduce((a, b) => a + b, 0),
     });
   }
 
@@ -520,6 +575,8 @@ function toCsv(rows) {
     "jmaMaxGustTime",
     "omMaxGustTime",
     "gustPeakHourDiff",
+    "jmaMaxWindDir",
+    "jmaMaxGustDir",
     "omAvgTemp",
     "omPrecipitationTotal",
   ];
@@ -602,10 +659,38 @@ function generateMarkdown({
       round(r.omMaxGust - r.jmaMaxGust, 1),
     ]);
 
-  const missRows = [...rows]
+  const missRows15 = [...rows]
     .filter((r) => Number.isFinite(r.jmaMaxGust) && Number.isFinite(r.omMaxGust))
     .filter((r) => r.jmaMaxGust >= 15 && r.omMaxGust < 15)
     .sort((a, b) => b.jmaMaxGust - a.jmaMaxGust)
+    .slice(0, 15)
+    .map((r) => [
+      r.date,
+      round(r.jmaMaxGust, 1),
+      r.jmaMaxGustTime ?? "",
+      round(r.omMaxGust, 1),
+      r.omMaxGustTime ?? "",
+      round(r.omMaxGust - r.jmaMaxGust, 1),
+    ]);
+
+  const missRows20 = [...rows]
+    .filter((r) => Number.isFinite(r.jmaMaxGust) && Number.isFinite(r.omMaxGust))
+    .filter((r) => r.jmaMaxGust >= 20 && r.omMaxGust < 20)
+    .sort((a, b) => b.jmaMaxGust - a.jmaMaxGust)
+    .slice(0, 15)
+    .map((r) => [
+      r.date,
+      round(r.jmaMaxGust, 1),
+      r.jmaMaxGustTime ?? "",
+      round(r.omMaxGust, 1),
+      r.omMaxGustTime ?? "",
+      round(r.omMaxGust - r.jmaMaxGust, 1),
+    ]);
+
+  const falseAlarmRows20 = [...rows]
+    .filter((r) => Number.isFinite(r.jmaMaxGust) && Number.isFinite(r.omMaxGust))
+    .filter((r) => r.jmaMaxGust < 20 && r.omMaxGust >= 20)
+    .sort((a, b) => b.omMaxGust - a.omMaxGust)
     .slice(0, 15)
     .map((r) => [
       r.date,
@@ -674,8 +759,9 @@ function generateMarkdown({
 ## 評価の前提
 
 - 観測値は気象庁の ${CONFIG.stationName} の日別値です。
+- 気象庁データは日別値の \`view=a3\`、つまり風向・風速の詳細ページから取得しています。
 - Open-Meteo は Historical Forecast API の時間別データを日別に集計しています。
-- Open-Meteo の日最大突風は、1時間ごとの wind_gusts_10m の最大値です。
+- Open-Meteo の日最大突風は、1時間ごとの \`wind_gusts_10m\` の最大値です。
 - 気象庁の日最大瞬間風速と Open-Meteo の時間別突風は、観測方法・時間解像度・地点条件が完全一致しないため、厳密な同一物ではありません。
 - ここでは「御前崎周辺の強風リスクをOpen-Meteoが拾えるか」を見るための実用評価として扱います。
 
@@ -707,14 +793,29 @@ ${mdTable(
 
 ${mdTable(
   ["日付", "気象庁 最大瞬間", "気象庁 時刻", "Open-Meteo 最大突風", "Open-Meteo 時刻", "差"],
-  missRows.length ? missRows : [["該当なし", "", "", "", "", ""]]
+  missRows15.length ? missRows15 : [["該当なし", "", "", "", "", ""]]
 )}
 
-## 6. 読み方
+## 6. 20m/s以上の見逃し 上位15件
+
+${mdTable(
+  ["日付", "気象庁 最大瞬間", "気象庁 時刻", "Open-Meteo 最大突風", "Open-Meteo 時刻", "差"],
+  missRows20.length ? missRows20 : [["該当なし", "", "", "", "", ""]]
+)}
+
+## 7. 20m/s以上の空振り 上位15件
+
+${mdTable(
+  ["日付", "気象庁 最大瞬間", "気象庁 時刻", "Open-Meteo 最大突風", "Open-Meteo 時刻", "差"],
+  falseAlarmRows20.length ? falseAlarmRows20 : [["該当なし", "", "", "", "", ""]]
+)}
+
+## 8. 読み方
 
 - 日最大瞬間風速/突風の MAE が大きい場合でも、15m/s以上・20m/s以上の検出率が高ければ、警告用途には使える可能性があります。
 - 20m/s以上の見逃しが出る場合、営業停止・作業停止の判断に直結させるには危険です。
 - Bias が負に大きい場合、Open-Meteo は御前崎の突風を弱めに出す傾向があります。この場合はアプリの黄色・赤色しきい値を下げる補正が必要です。
+- Bias が正に大きい場合、Open-Meteo は強めに出る傾向があります。この場合は通知が多くなる可能性があります。
 - ピーク時刻のズレが大きい場合、毎時警告よりも「数時間幅で注意」を出す運用が向いています。
 `;
 }
