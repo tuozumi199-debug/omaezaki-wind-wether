@@ -6,11 +6,26 @@
   <title>ネット操作記録 | 御前崎・池新田</title>
 
   <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card2: #334155;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --line: #475569;
+      --blue: #38bdf8;
+      --blueText: #082f49;
+      --green: #14532d;
+      --yellow: #854d0e;
+      --red: #7f1d1d;
+      --purple: #581c87;
+    }
+
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
+      background: var(--bg);
+      color: var(--text);
     }
 
     header {
@@ -22,8 +37,13 @@
       margin: 0 0 6px;
     }
 
+    h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+
     .sub {
-      color: #94a3b8;
+      color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
     }
@@ -37,8 +57,8 @@
 
     .nav a {
       text-decoration: none;
-      background: #334155;
-      color: #e5e7eb;
+      background: var(--card2);
+      color: var(--text);
       padding: 10px 14px;
       border-radius: 12px;
       font-size: 14px;
@@ -46,28 +66,73 @@
     }
 
     .nav a.active {
-      background: #38bdf8;
-      color: #082f49;
+      background: var(--blue);
+      color: var(--blueText);
     }
 
     .card {
-      background: #1e293b;
+      background: var(--card);
       margin: 12px;
       padding: 16px;
       border-radius: 18px;
       box-shadow: 0 8px 20px rgba(0,0,0,.25);
     }
 
-    .card h2 {
-      font-size: 18px;
-      margin: 0 0 12px;
-    }
-
-    .grid {
+    .grid2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mini {
+      background: var(--card2);
+      padding: 12px;
+      border-radius: 14px;
+      min-height: 62px;
+    }
+
+    .label {
+      font-size: 12px;
+      color: #cbd5e1;
+      margin-bottom: 4px;
+    }
+
+    .value {
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .big {
+      font-size: 34px;
+      font-weight: 900;
+      line-height: 1.05;
+    }
+
+    .unit {
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .status {
+      font-size: 22px;
+      font-weight: 900;
+      padding: 12px;
+      border-radius: 14px;
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    .normal { background: var(--green); }
+    .caution { background: var(--yellow); }
+    .warning { background: var(--red); }
+    .stop { background: var(--purple); }
 
     .field {
       display: flex;
@@ -83,7 +148,7 @@
     label {
       font-size: 13px;
       color: #cbd5e1;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     input, select, textarea {
@@ -91,9 +156,9 @@
       box-sizing: border-box;
       padding: 12px;
       border-radius: 12px;
-      border: 1px solid #475569;
-      background: #0f172a;
-      color: #e5e7eb;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--text);
       font-size: 15px;
     }
 
@@ -102,27 +167,42 @@
       resize: vertical;
     }
 
-    .mini-grid {
+    .quick-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
 
-    .mini {
-      background: #334155;
-      padding: 12px;
+    button {
+      border: none;
       border-radius: 14px;
+      font-size: 15px;
+      font-weight: 800;
+      padding: 13px 16px;
+      cursor: pointer;
     }
 
-    .label {
-      font-size: 12px;
-      color: #cbd5e1;
-      margin-bottom: 4px;
+    .quick-btn {
+      background: var(--card2);
+      color: var(--text);
+      padding: 15px;
+      text-align: center;
     }
 
-    .value {
-      font-size: 20px;
-      font-weight: 700;
+    .primary {
+      background: var(--blue);
+      color: var(--blueText);
+      flex: 1;
+    }
+
+    .secondary {
+      background: var(--card2);
+      color: var(--text);
+    }
+
+    .danger {
+      background: var(--red);
+      color: #fff;
     }
 
     .btn-row {
@@ -132,71 +212,32 @@
       margin-top: 8px;
     }
 
-    button {
-      border: none;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 700;
-      padding: 13px 16px;
-      cursor: pointer;
-    }
-
-    .primary {
-      background: #38bdf8;
-      color: #082f49;
-      flex: 1;
-    }
-
-    .secondary {
-      background: #334155;
-      color: #e5e7eb;
-    }
-
-    .danger {
-      background: #7f1d1d;
-      color: #fff;
-    }
-
-    .quick-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .quick-btn {
-      background: #334155;
-      color: #e5e7eb;
-      padding: 14px;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 700;
-      text-align: center;
-      border: none;
-      cursor: pointer;
-    }
-
-    .quick-btn:hover {
-      opacity: 0.95;
-    }
-
     .tag {
       display: inline-block;
       padding: 5px 10px;
       border-radius: 999px;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 900;
       margin-right: 6px;
+      white-space: nowrap;
     }
 
-    .ok { background: #14532d; color: #dcfce7; }
-    .warn { background: #854d0e; color: #fef3c7; }
-    .bad { background: #7f1d1d; color: #fee2e2; }
+    .tag-ok { background: var(--green); color: #dcfce7; }
+    .tag-warn { background: var(--yellow); color: #fef3c7; }
+    .tag-bad { background: var(--red); color: #fee2e2; }
+    .tag-blue { background: #075985; color: #e0f2fe; }
+    .tag-purple { background: var(--purple); color: #f3e8ff; }
 
     .record {
-      background: #334155;
+      background: var(--card2);
       border-radius: 14px;
       padding: 14px;
       margin-bottom: 10px;
+    }
+
+    .record-now {
+      outline: 2px solid var(--blue);
+      box-shadow: 0 0 0 4px rgba(56,189,248,.12);
     }
 
     .record-top {
@@ -208,27 +249,59 @@
     }
 
     .record-title {
-      font-weight: 800;
-      font-size: 16px;
+      font-weight: 900;
+      font-size: 17px;
     }
 
     .record-time {
       font-size: 13px;
       color: #cbd5e1;
+      margin-top: 2px;
     }
 
     .record-meta {
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.65;
       color: #e2e8f0;
       white-space: pre-line;
     }
 
+    .danger-day {
+      background: #111827;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .danger-day-title {
+      font-size: 16px;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .danger-day-meta {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
     .empty {
-      color: #94a3b8;
+      color: var(--muted);
       font-size: 14px;
       text-align: center;
       padding: 18px 0;
+    }
+
+    .notice {
+      background: #111827;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #cbd5e1;
     }
 
     footer {
@@ -238,9 +311,13 @@
       line-height: 1.5;
     }
 
-    @media (max-width: 640px) {
-      .grid, .mini-grid, .quick-row {
+    @media (max-width: 700px) {
+      .grid2, .grid3, .quick-row {
         grid-template-columns: 1fr;
+      }
+
+      .big {
+        font-size: 30px;
       }
     }
   </style>
@@ -250,8 +327,8 @@
   <header>
     <h1>ネット操作記録</h1>
     <div class="sub">
-      打ちっぱなしネットの上げ下げ判断用の記録ページです。<br>
-      その時の予報値と、実際の危険度・体感・メモを残せます。
+      打ちっぱなしネットの上げ下げ判断用。<br>
+      操作内容・体感・危険度・その時点の予報値を保存します。
     </div>
   </header>
 
@@ -262,30 +339,70 @@
   </div>
 
   <section class="card">
-    <h2>現在の参考値</h2>
-    <div class="mini-grid">
-      <div class="mini">
-        <div class="label">現在の風速</div>
-        <div class="value"><span id="currentWind">--</span> m/s</div>
-      </div>
+    <h2>ネット操作判定</h2>
+
+    <div class="grid2">
       <div class="mini">
         <div class="label">現在の突風</div>
-        <div class="value"><span id="currentGust">--</span> m/s</div>
+        <div>
+          <span id="currentGust" class="big">--</span>
+          <span class="unit">m/s</span>
+        </div>
       </div>
+
       <div class="mini">
-        <div class="label">風向</div>
-        <div class="value" id="currentDir">--</div>
-      </div>
-      <div class="mini">
-        <div class="label">気温 / 天気</div>
-        <div class="value" style="font-size:16px;">
-          <span id="currentTemp">--</span>℃ / <span id="currentWeather">--</span>
+        <div class="label">現在の風速</div>
+        <div>
+          <span id="currentWind" class="big">--</span>
+          <span class="unit">m/s</span>
         </div>
       </div>
     </div>
 
+    <div id="operationStatus" class="status normal">取得待ち</div>
+
+    <div class="grid3" style="margin-top:10px;">
+      <div class="mini">
+        <div class="label">今後6時間 最大突風</div>
+        <div class="value"><span id="maxGust6h">--</span> m/s</div>
+        <div class="sub">ピーク：<span id="peakTime6h">--</span></div>
+      </div>
+
+      <div class="mini">
+        <div class="label">翌朝9時まで 最大突風</div>
+        <div class="value"><span id="maxGustMorning">--</span> m/s</div>
+        <div class="sub">ピーク：<span id="peakTimeMorning">--</span></div>
+      </div>
+
+      <div class="mini">
+        <div class="label">推奨判断目安</div>
+        <div class="value" style="font-size:16px;" id="operationAdvice">--</div>
+      </div>
+    </div>
+
+    <div class="grid3" style="margin-top:10px;">
+      <div class="mini">
+        <div class="label">風向</div>
+        <div class="value" id="currentDir">--</div>
+      </div>
+
+      <div class="mini">
+        <div class="label">気温</div>
+        <div class="value"><span id="currentTemp">--</span> ℃</div>
+      </div>
+
+      <div class="mini">
+        <div class="label">天気</div>
+        <div class="value" id="currentWeather">--</div>
+      </div>
+    </div>
+
     <div class="btn-row">
-      <button class="secondary" onclick="loadCurrentWeather()">現在値を更新</button>
+      <button class="secondary" onclick="loadWeather()">現在値を更新</button>
+    </div>
+
+    <div class="sub" style="margin-top:10px;">
+      最終更新：<span id="updatedAt">--</span>
     </div>
   </section>
 
@@ -304,7 +421,7 @@
   <section class="card">
     <h2>記録を入力</h2>
 
-    <div class="grid">
+    <div class="grid2">
       <div class="field">
         <label for="recordedAt">記録日時</label>
         <input type="datetime-local" id="recordedAt" />
@@ -343,18 +460,18 @@
       </div>
 
       <div class="field">
-        <label for="manualWind">体感風速（任意 / m/s）</label>
+        <label for="manualWind">実測・体感風速 任意 m/s</label>
         <input type="number" step="0.1" id="manualWind" placeholder="例 8.5" />
       </div>
 
       <div class="field">
-        <label for="manualGust">体感突風（任意 / m/s）</label>
+        <label for="manualGust">実測・体感突風 任意 m/s</label>
         <input type="number" step="0.1" id="manualGust" placeholder="例 16.2" />
       </div>
 
       <div class="field full">
         <label for="memo">メモ</label>
-        <textarea id="memo" placeholder="例：20時前後から急に吹き出した。下げる途中が危なかった。南西からの横風が強かった。"></textarea>
+        <textarea id="memo" placeholder="例：20時前から急に吹き出した。下げる途中が危なかった。西寄りの横風が強かった。"></textarea>
       </div>
     </div>
 
@@ -363,6 +480,36 @@
       <button class="secondary" onclick="fillNow()">時刻を現在にする</button>
       <button class="secondary" onclick="clearForm()">入力クリア</button>
     </div>
+  </section>
+
+  <section class="card">
+    <h2>記録サマリー</h2>
+
+    <div class="grid3">
+      <div class="mini">
+        <div class="label">総記録数</div>
+        <div class="value"><span id="summaryTotal">0</span> 件</div>
+      </div>
+
+      <div class="mini">
+        <div class="label">危険・異常記録</div>
+        <div class="value"><span id="summaryDanger">0</span> 件</div>
+      </div>
+
+      <div class="mini">
+        <div class="label">記録上の最大突風</div>
+        <div class="value"><span id="summaryMaxGust">--</span> m/s</div>
+      </div>
+    </div>
+
+    <div class="notice" style="margin-top:10px;">
+      「少し危険」「かなり危険」「破損/異常あり」または、予報・入力突風が15m/s以上の記録を危険記録として集計します。
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>危険だった日</h2>
+    <div id="dangerDaysList"></div>
   </section>
 
   <section class="card">
@@ -377,14 +524,14 @@
   </section>
 
   <footer>
-    記録はこの端末のブラウザに保存されます（localStorage）。<br>
-    iPhoneで使う場合は同じブラウザ・同じ端末で保存データが残ります。必要に応じてCSVで退避してください。
+    記録はこの端末のブラウザに保存されます。<br>
+    iPhoneで使う場合、同じ端末・同じブラウザで保存データが残ります。必要に応じてCSVで退避してください。
   </footer>
 
   <script>
     const LAT = 34.647;
     const LON = 138.126;
-    const STORAGE_KEY = "omaezaki_net_operation_logs_v1";
+    const STORAGE_KEY = "omaezaki_net_operation_logs_v2";
 
     let latestSnapshot = {
       weather: "",
@@ -392,12 +539,21 @@
       wind: null,
       gust: null,
       dir: "",
+      maxGust6h: null,
+      peakTime6h: "",
+      maxGustMorning: null,
+      peakTimeMorning: "",
+      operationAdvice: "",
       rawTime: ""
     };
 
     function degToDir(deg) {
-      const dirs = ["北", "北北東", "北東", "東北東", "東", "東南東", "南東", "南南東",
-                    "南", "南南西", "南西", "西南西", "西", "西北西", "北西", "北北西"];
+      const dirs = [
+        "北", "北北東", "北東", "東北東",
+        "東", "東南東", "南東", "南南東",
+        "南", "南南西", "南西", "西南西",
+        "西", "西北西", "北西", "北北西"
+      ];
       return dirs[Math.round(deg / 22.5) % 16];
     }
 
@@ -421,7 +577,9 @@
         80: "にわか雨",
         81: "にわか雨",
         82: "強いにわか雨",
-        95: "雷雨"
+        95: "雷雨",
+        96: "雷雨",
+        99: "雷雨"
       };
       return map[code] ?? "不明";
     }
@@ -436,26 +594,113 @@
       document.getElementById("recordedAt").value = nowForInput();
     }
 
-    function clearForm() {
-      fillNow();
-      document.getElementById("actionType").value = "上げ開始";
-      document.getElementById("riskLevel").value = "問題なし";
-      document.getElementById("feltWind").value = "弱い";
-      document.getElementById("manualWind").value = "";
-      document.getElementById("manualGust").value = "";
-      document.getElementById("memo").value = "";
+    function formatHourJa(iso) {
+      if (!iso) return "--";
+      const d = new Date(iso);
+      return `${d.getHours()}時`;
     }
 
-    function quickSetAction(action) {
-      document.getElementById("actionType").value = action;
-      fillNow();
-      document.getElementById("memo").focus();
+    function formatDateTime(value) {
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return value || "--";
+      return d.toLocaleString("ja-JP", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function formatDateOnly(value) {
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return value?.slice(0, 10) || "--";
+      return d.toLocaleDateString("ja-JP", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric"
+      });
+    }
+
+    function getTomorrow9Iso() {
+      const now = new Date();
+      const t = new Date(now);
+      t.setDate(t.getDate() + 1);
+      t.setHours(9, 0, 0, 0);
+      return t;
+    }
+
+    function findMaxGustInRange(hourly, endDate) {
+      let best = {
+        gust: null,
+        time: ""
+      };
+
+      for (let i = 0; i < hourly.time.length; i++) {
+        const time = new Date(hourly.time[i]);
+        if (time > endDate) continue;
+
+        const gust = hourly.wind_gusts_10m[i];
+        if (!Number.isFinite(gust)) continue;
+
+        if (best.gust == null || gust > best.gust) {
+          best = {
+            gust,
+            time: hourly.time[i]
+          };
+        }
+      }
+
+      return best;
+    }
+
+    function judgeOperation(gustNow, maxGust6h, maxGustMorning) {
+      const target = Math.max(
+        Number.isFinite(gustNow) ? gustNow : 0,
+        Number.isFinite(maxGust6h) ? maxGust6h : 0,
+        Number.isFinite(maxGustMorning) ? maxGustMorning : 0
+      );
+
+      if (target >= 20) {
+        return {
+          text: "強風警戒",
+          cls: "stop",
+          advice: "風が強くなる前にネット操作を完了"
+        };
+      }
+
+      if (target >= 15) {
+        return {
+          text: "操作注意",
+          cls: "warning",
+          advice: "早めに下げる判断を検討"
+        };
+      }
+
+      if (target >= 12) {
+        return {
+          text: "準備注意",
+          cls: "caution",
+          advice: "次の更新で強まり方を確認"
+        };
+      }
+
+      return {
+        text: "通常",
+        cls: "normal",
+        advice: "通常運用"
+      };
     }
 
     function getRecords() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-      } catch (e) {
+        const v2 = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+        if (Array.isArray(v2) && v2.length) return v2;
+
+        const old = JSON.parse(localStorage.getItem("omaezaki_net_operation_logs_v1") || "[]");
+        return Array.isArray(old) ? old : [];
+      } catch {
         return [];
       }
     }
@@ -464,16 +709,20 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
     }
 
-    async function loadCurrentWeather() {
+    async function loadWeather() {
       try {
         const url =
           `https://api.open-meteo.com/v1/forecast` +
           `?latitude=${LAT}&longitude=${LON}` +
           `&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
+          `&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
           `&timezone=Asia%2FTokyo` +
-          `&wind_speed_unit=ms`;
+          `&wind_speed_unit=ms` +
+          `&forecast_days=2`;
 
         const res = await fetch(url);
+        if (!res.ok) throw new Error(`API error ${res.status}`);
+
         const data = await res.json();
 
         const wind = data.current.wind_speed_10m;
@@ -483,12 +732,40 @@
         const weatherText = weatherCodeToJa(data.current.weather_code);
         const dir = degToDir(dirDeg);
 
+        const now = new Date();
+        const sixHoursLater = new Date(now.getTime() + 6 * 60 * 60 * 1000);
+        const tomorrow9 = getTomorrow9Iso();
+
+        const hourlyFromNow = {
+          time: [],
+          wind_gusts_10m: []
+        };
+
+        for (let i = 0; i < data.hourly.time.length; i++) {
+          const t = new Date(data.hourly.time[i]);
+
+          if (t >= now) {
+            hourlyFromNow.time.push(data.hourly.time[i]);
+            hourlyFromNow.wind_gusts_10m.push(data.hourly.wind_gusts_10m[i]);
+          }
+        }
+
+        const max6 = findMaxGustInRange(hourlyFromNow, sixHoursLater);
+        const maxMorning = findMaxGustInRange(hourlyFromNow, tomorrow9);
+
+        const operation = judgeOperation(gust, max6.gust, maxMorning.gust);
+
         latestSnapshot = {
           weather: weatherText,
           temp,
           wind,
           gust,
           dir,
+          maxGust6h: max6.gust,
+          peakTime6h: max6.time,
+          maxGustMorning: maxMorning.gust,
+          peakTimeMorning: maxMorning.time,
+          operationAdvice: operation.advice,
           rawTime: data.current.time
         };
 
@@ -497,34 +774,52 @@
         document.getElementById("currentDir").textContent = dir;
         document.getElementById("currentTemp").textContent = temp.toFixed(1);
         document.getElementById("currentWeather").textContent = weatherText;
+
+        document.getElementById("maxGust6h").textContent =
+          max6.gust == null ? "--" : max6.gust.toFixed(1);
+        document.getElementById("peakTime6h").textContent = formatHourJa(max6.time);
+
+        document.getElementById("maxGustMorning").textContent =
+          maxMorning.gust == null ? "--" : maxMorning.gust.toFixed(1);
+        document.getElementById("peakTimeMorning").textContent = formatHourJa(maxMorning.time);
+
+        document.getElementById("operationAdvice").textContent = operation.advice;
+
+        const status = document.getElementById("operationStatus");
+        status.textContent = operation.text;
+        status.className = `status ${operation.cls}`;
+
+        document.getElementById("updatedAt").textContent =
+          new Date().toLocaleString("ja-JP");
       } catch (e) {
-        alert("現在値の取得に失敗しました");
+        alert("天気データの取得に失敗しました。少し時間を置いて更新してください。");
       }
     }
 
-    function riskClass(level) {
-      if (level === "問題なし") return "ok";
-      if (level === "少し危険") return "warn";
-      return "bad";
+    function quickSetAction(action) {
+      document.getElementById("actionType").value = action;
+      fillNow();
+
+      if (action === "異常あり") {
+        document.getElementById("riskLevel").value = "破損/異常あり";
+        document.getElementById("feltWind").value = "非常に強い";
+      }
+
+      if (action === "見送り") {
+        document.getElementById("riskLevel").value = "少し危険";
+      }
+
+      document.getElementById("memo").focus();
     }
 
-    function buildMemoBlock(record) {
-      const lines = [];
-      lines.push(`危険度：${record.riskLevel} / 体感風：${record.feltWind}`);
-
-      if (record.manualWind || record.manualGust) {
-        lines.push(`体感入力：風速 ${record.manualWind || "--"} m/s / 突風 ${record.manualGust || "--"} m/s`);
-      }
-
-      lines.push(
-        `予報参考：風速 ${record.snapshotWind ?? "--"} m/s / 突風 ${record.snapshotGust ?? "--"} m/s / 風向 ${record.snapshotDir || "--"} / 気温 ${record.snapshotTemp ?? "--"}℃ / ${record.snapshotWeather || "--"}`
-      );
-
-      if (record.memo) {
-        lines.push(`メモ：${record.memo}`);
-      }
-
-      return lines.join("\n");
+    function clearForm() {
+      fillNow();
+      document.getElementById("actionType").value = "上げ開始";
+      document.getElementById("riskLevel").value = "問題なし";
+      document.getElementById("feltWind").value = "弱い";
+      document.getElementById("manualWind").value = "";
+      document.getElementById("manualGust").value = "";
+      document.getElementById("memo").value = "";
     }
 
     function saveRecord() {
@@ -552,32 +847,97 @@
         manualWind,
         manualGust,
         memo,
+
         snapshotWind: latestSnapshot.wind != null ? latestSnapshot.wind.toFixed(1) : "",
         snapshotGust: latestSnapshot.gust != null ? latestSnapshot.gust.toFixed(1) : "",
         snapshotDir: latestSnapshot.dir || "",
         snapshotTemp: latestSnapshot.temp != null ? latestSnapshot.temp.toFixed(1) : "",
         snapshotWeather: latestSnapshot.weather || "",
+
+        snapshotMaxGust6h: latestSnapshot.maxGust6h != null ? latestSnapshot.maxGust6h.toFixed(1) : "",
+        snapshotPeakTime6h: latestSnapshot.peakTime6h || "",
+        snapshotMaxGustMorning: latestSnapshot.maxGustMorning != null ? latestSnapshot.maxGustMorning.toFixed(1) : "",
+        snapshotPeakTimeMorning: latestSnapshot.peakTimeMorning || "",
+        snapshotOperationAdvice: latestSnapshot.operationAdvice || "",
+
         createdAt: new Date().toISOString()
       };
 
       records.unshift(record);
       setRecords(records);
-      renderRecords();
+
+      renderAll();
       clearForm();
+
       alert("記録を保存しました");
     }
 
-    function deleteRecord(id) {
-      if (!confirm("この記録を削除しますか？")) return;
-      const records = getRecords().filter(r => r.id !== id);
-      setRecords(records);
-      renderRecords();
+    function isDangerRecord(record) {
+      const riskDanger = record.riskLevel !== "問題なし";
+      const actionDanger = record.actionType === "異常あり";
+      const manualGust = Number(record.manualGust);
+      const snapshotGust = Number(record.snapshotGust);
+      const snapshotMaxGust6h = Number(record.snapshotMaxGust6h);
+      const snapshotMaxGustMorning = Number(record.snapshotMaxGustMorning);
+
+      return (
+        riskDanger ||
+        actionDanger ||
+        manualGust >= 15 ||
+        snapshotGust >= 15 ||
+        snapshotMaxGust6h >= 15 ||
+        snapshotMaxGustMorning >= 15
+      );
     }
 
-    function clearAllRecords() {
-      if (!confirm("すべての記録を削除しますか？")) return;
-      localStorage.removeItem(STORAGE_KEY);
-      renderRecords();
+    function riskClass(level) {
+      if (level === "問題なし") return "tag-ok";
+      if (level === "少し危険") return "tag-warn";
+      return "tag-bad";
+    }
+
+    function gustTagClass(value) {
+      const n = Number(value);
+      if (n >= 20) return "tag-bad";
+      if (n >= 15) return "tag-warn";
+      return "tag-blue";
+    }
+
+    function buildRecordText(record) {
+      const lines = [];
+
+      lines.push(`危険度：${record.riskLevel} / 体感風：${record.feltWind}`);
+
+      if (record.manualWind || record.manualGust) {
+        lines.push(`入力：風速 ${record.manualWind || "--"} m/s / 突風 ${record.manualGust || "--"} m/s`);
+      }
+
+      lines.push(
+        `保存時点：風速 ${record.snapshotWind || "--"} m/s / 突風 ${record.snapshotGust || "--"} m/s / 風向 ${record.snapshotDir || "--"} / 気温 ${record.snapshotTemp || "--"}℃ / ${record.snapshotWeather || "--"}`
+      );
+
+      if (record.snapshotMaxGust6h || record.snapshotMaxGustMorning) {
+        lines.push(
+          `予報：6時間最大 ${record.snapshotMaxGust6h || "--"} m/s（${formatHourJa(record.snapshotPeakTime6h)}） / 翌朝9時まで最大 ${record.snapshotMaxGustMorning || "--"} m/s（${formatHourJa(record.snapshotPeakTimeMorning)}）`
+        );
+      }
+
+      if (record.snapshotOperationAdvice) {
+        lines.push(`判断目安：${record.snapshotOperationAdvice}`);
+      }
+
+      if (record.memo) {
+        lines.push(`メモ：${record.memo}`);
+      }
+
+      return lines.join("\n");
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
 
     function renderRecords() {
@@ -589,26 +949,133 @@
         return;
       }
 
-      list.innerHTML = records.map(record => `
-        <div class="record">
-          <div class="record-top">
-            <div>
-              <div class="record-title">${record.actionType}</div>
-              <div class="record-time">${formatDateTime(record.recordedAt)}</div>
+      list.innerHTML = records.map(record => {
+        const danger = isDangerRecord(record);
+        const gustValue =
+          record.snapshotMaxGustMorning ||
+          record.snapshotMaxGust6h ||
+          record.snapshotGust ||
+          "";
+
+        return `
+          <div class="record ${danger ? "record-now" : ""}">
+            <div class="record-top">
+              <div>
+                <div class="record-title">${escapeHtml(record.actionType)}</div>
+                <div class="record-time">${escapeHtml(formatDateTime(record.recordedAt))}</div>
+              </div>
+              <div>
+                <span class="tag ${riskClass(record.riskLevel)}">${escapeHtml(record.riskLevel)}</span>
+                ${gustValue ? `<span class="tag ${gustTagClass(gustValue)}">突 ${escapeHtml(gustValue)}m/s</span>` : ""}
+              </div>
             </div>
-            <div>
-              <span class="tag ${riskClass(record.riskLevel)}">${record.riskLevel}</span>
+
+            <div class="record-meta">${escapeHtml(buildRecordText(record))}</div>
+
+            <div class="btn-row" style="margin-top:10px;">
+              <button class="secondary" onclick="copyRecord('${record.id}')">内容コピー</button>
+              <button class="danger" onclick="deleteRecord('${record.id}')">削除</button>
             </div>
           </div>
+        `;
+      }).join("");
+    }
 
-          <div class="record-meta">${escapeHtml(buildMemoBlock(record))}</div>
+    function renderSummary() {
+      const records = getRecords();
+      const dangerRecords = records.filter(isDangerRecord);
 
-          <div class="btn-row" style="margin-top:10px;">
-            <button class="secondary" onclick="copyRecord('${record.id}')">内容コピー</button>
-            <button class="danger" onclick="deleteRecord('${record.id}')">削除</button>
+      const gustValues = records.flatMap(r => [
+        Number(r.manualGust),
+        Number(r.snapshotGust),
+        Number(r.snapshotMaxGust6h),
+        Number(r.snapshotMaxGustMorning)
+      ]).filter(Number.isFinite);
+
+      const maxGust = gustValues.length ? Math.max(...gustValues) : null;
+
+      document.getElementById("summaryTotal").textContent = records.length;
+      document.getElementById("summaryDanger").textContent = dangerRecords.length;
+      document.getElementById("summaryMaxGust").textContent =
+        maxGust == null ? "--" : maxGust.toFixed(1);
+    }
+
+    function renderDangerDays() {
+      const box = document.getElementById("dangerDaysList");
+      const records = getRecords().filter(isDangerRecord);
+
+      if (!records.length) {
+        box.innerHTML = `<div class="empty">危険記録はまだありません</div>`;
+        return;
+      }
+
+      const byDate = new Map();
+
+      for (const r of records) {
+        const key = r.recordedAt.slice(0, 10);
+        if (!byDate.has(key)) byDate.set(key, []);
+        byDate.get(key).push(r);
+      }
+
+      const groups = [...byDate.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+
+      box.innerHTML = groups.map(([date, items]) => {
+        const maxGust = Math.max(
+          ...items.flatMap(r => [
+            Number(r.manualGust),
+            Number(r.snapshotGust),
+            Number(r.snapshotMaxGust6h),
+            Number(r.snapshotMaxGustMorning)
+          ]).filter(Number.isFinite)
+        );
+
+        const actions = [...new Set(items.map(r => r.actionType))].join(" / ");
+        const risks = [...new Set(items.map(r => r.riskLevel))].join(" / ");
+
+        const memos = items
+          .map(r => r.memo)
+          .filter(Boolean)
+          .slice(0, 3)
+          .map(m => `・${m}`)
+          .join("\n");
+
+        return `
+          <div class="danger-day">
+            <div class="danger-day-title">
+              ${escapeHtml(formatDateOnly(date))}
+              <span class="tag ${gustTagClass(maxGust)}">最大 ${Number.isFinite(maxGust) ? maxGust.toFixed(1) : "--"}m/s</span>
+            </div>
+            <div class="danger-day-meta">
+記録数：${items.length}件
+操作：${escapeHtml(actions)}
+危険度：${escapeHtml(risks)}
+${escapeHtml(memos)}
+            </div>
           </div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
+    }
+
+    function renderAll() {
+      renderSummary();
+      renderDangerDays();
+      renderRecords();
+    }
+
+    function deleteRecord(id) {
+      if (!confirm("この記録を削除しますか？")) return;
+
+      const records = getRecords().filter(r => r.id !== id);
+      setRecords(records);
+      renderAll();
+    }
+
+    function clearAllRecords() {
+      if (!confirm("すべての記録を削除しますか？")) return;
+
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem("omaezaki_net_operation_logs_v1");
+      renderAll();
     }
 
     function copyRecord(id) {
@@ -618,34 +1085,12 @@
       const text = [
         `操作：${record.actionType}`,
         `日時：${formatDateTime(record.recordedAt)}`,
-        `危険度：${record.riskLevel}`,
-        `体感風：${record.feltWind}`,
-        `体感入力：風速 ${record.manualWind || "--"} m/s / 突風 ${record.manualGust || "--"} m/s`,
-        `予報参考：風速 ${record.snapshotWind || "--"} m/s / 突風 ${record.snapshotGust || "--"} m/s / 風向 ${record.snapshotDir || "--"} / 気温 ${record.snapshotTemp || "--"}℃ / ${record.snapshotWeather || "--"}`,
-        `メモ：${record.memo || ""}`
+        buildRecordText(record)
       ].join("\n");
 
       navigator.clipboard.writeText(text)
         .then(() => alert("記録内容をコピーしました"))
         .catch(() => alert("コピーに失敗しました"));
-    }
-
-    function formatDateTime(value) {
-      const d = new Date(value);
-      return d.toLocaleString("ja-JP", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-      });
-    }
-
-    function escapeHtml(str) {
-      return String(str ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
     }
 
     function exportCSV() {
@@ -668,6 +1113,11 @@
         "snapshotDir",
         "snapshotTemp",
         "snapshotWeather",
+        "snapshotMaxGust6h",
+        "snapshotPeakTime6h",
+        "snapshotMaxGustMorning",
+        "snapshotPeakTimeMorning",
+        "snapshotOperationAdvice",
         "memo"
       ];
 
@@ -682,7 +1132,7 @@
         ...records.map(r => headers.map(h => escapeCSV(r[h])).join(","))
       ];
 
-      const csv = lines.join("\n");
+      const csv = "\uFEFF" + lines.join("\n");
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
 
@@ -695,8 +1145,8 @@
     }
 
     fillNow();
-    loadCurrentWeather();
-    renderRecords();
+    loadWeather();
+    renderAll();
   </script>
 </body>
 </html>
