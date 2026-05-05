@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ネット操作記録 | 御前崎・池新田</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+
+    header {
+      padding: 18px 16px 8px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 6px;
+    }
+
+    .sub {
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      padding: 0 12px 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      background: #334155;
+      color: #e5e7eb;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .nav a.active {
+      background: #38bdf8;
+      color: #082f49;
+    }
+
+    .card {
+      background: #1e293b;
+      margin: 12px;
+      padding: 16px;
+      border-radius: 18px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.25);
+    }
+
+    .card h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 13px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #e5e7eb;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mini {
+      background: #334155;
+      padding: 12px;
+      border-radius: 14px;
+    }
+
+    .label {
+      font-size: 12px;
+      color: #cbd5e1;
+      margin-bottom: 4px;
+    }
+
+    .value {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 13px 16px;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #38bdf8;
+      color: #082f49;
+      flex: 1;
+    }
+
+    .secondary {
+      background: #334155;
+      color: #e5e7eb;
+    }
+
+    .danger {
+      background: #7f1d1d;
+      color: #fff;
+    }
+
+    .quick-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .quick-btn {
+      background: #334155;
+      color: #e5e7eb;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+    }
+
+    .quick-btn:hover {
+      opacity: 0.95;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+
+    .ok { background: #14532d; color: #dcfce7; }
+    .warn { background: #854d0e; color: #fef3c7; }
+    .bad { background: #7f1d1d; color: #fee2e2; }
+
+    .record {
+      background: #334155;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .record-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .record-title {
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .record-time {
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    .record-meta {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #e2e8f0;
+      white-space: pre-line;
+    }
+
+    .empty {
+      color: #94a3b8;
+      font-size: 14px;
+      text-align: center;
+      padding: 18px 0;
+    }
+
+    footer {
+      padding: 16px;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+      .grid, .mini-grid, .quick-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>ネット操作記録</h1>
+    <div class="sub">
+      打ちっぱなしネットの上げ下げ判断用の記録ページです。<br>
+      その時の予報値と、実際の危険度・体感・メモを残せます。
+    </div>
+  </header>
+
+  <div class="nav">
+    <a href="./index.html">Dashboard</a>
+    <a href="./detail.html">Detail</a>
+    <a href="./log.html" class="active">Log</a>
+  </div>
+
+  <section class="card">
+    <h2>現在の参考値</h2>
+    <div class="mini-grid">
+      <div class="mini">
+        <div class="label">現在の風速</div>
+        <div class="value"><span id="currentWind">--</span> m/s</div>
+      </div>
+      <div class="mini">
+        <div class="label">現在の突風</div>
+        <div class="value"><span id="currentGust">--</span> m/s</div>
+      </div>
+      <div class="mini">
+        <div class="label">風向</div>
+        <div class="value" id="currentDir">--</div>
+      </div>
+      <div class="mini">
+        <div class="label">気温 / 天気</div>
+        <div class="value" style="font-size:16px;">
+          <span id="currentTemp">--</span>℃ / <span id="currentWeather">--</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="secondary" onclick="loadCurrentWeather()">現在値を更新</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>クイック記録</h2>
+    <div class="quick-row">
+      <button class="quick-btn" onclick="quickSetAction('上げ開始')">上げ開始</button>
+      <button class="quick-btn" onclick="quickSetAction('上げ完了')">上げ完了</button>
+      <button class="quick-btn" onclick="quickSetAction('下げ開始')">下げ開始</button>
+      <button class="quick-btn" onclick="quickSetAction('下げ完了')">下げ完了</button>
+      <button class="quick-btn" onclick="quickSetAction('見送り')">見送り</button>
+      <button class="quick-btn" onclick="quickSetAction('異常あり')">異常あり</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>記録を入力</h2>
+
+    <div class="grid">
+      <div class="field">
+        <label for="recordedAt">記録日時</label>
+        <input type="datetime-local" id="recordedAt" />
+      </div>
+
+      <div class="field">
+        <label for="actionType">操作内容</label>
+        <select id="actionType">
+          <option value="上げ開始">上げ開始</option>
+          <option value="上げ完了">上げ完了</option>
+          <option value="下げ開始">下げ開始</option>
+          <option value="下げ完了">下げ完了</option>
+          <option value="見送り">見送り</option>
+          <option value="異常あり">異常あり</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="riskLevel">実際の危険度</label>
+        <select id="riskLevel">
+          <option value="問題なし">問題なし</option>
+          <option value="少し危険">少し危険</option>
+          <option value="かなり危険">かなり危険</option>
+          <option value="破損/異常あり">破損/異常あり</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="feltWind">体感風</label>
+        <select id="feltWind">
+          <option value="弱い">弱い</option>
+          <option value="やや強い">やや強い</option>
+          <option value="強い">強い</option>
+          <option value="非常に強い">非常に強い</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="manualWind">体感風速（任意 / m/s）</label>
+        <input type="number" step="0.1" id="manualWind" placeholder="例 8.5" />
+      </div>
+
+      <div class="field">
+        <label for="manualGust">体感突風（任意 / m/s）</label>
+        <input type="number" step="0.1" id="manualGust" placeholder="例 16.2" />
+      </div>
+
+      <div class="field full">
+        <label for="memo">メモ</label>
+        <textarea id="memo" placeholder="例：20時前後から急に吹き出した。下げる途中が危なかった。南西からの横風が強かった。"></textarea>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="primary" onclick="saveRecord()">記録を保存</button>
+      <button class="secondary" onclick="fillNow()">時刻を現在にする</button>
+      <button class="secondary" onclick="clearForm()">入力クリア</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>保存済み記録</h2>
+
+    <div class="btn-row">
+      <button class="secondary" onclick="exportCSV()">CSVエクスポート</button>
+      <button class="danger" onclick="clearAllRecords()">全記録削除</button>
+    </div>
+
+    <div id="recordsList" style="margin-top:14px;"></div>
+  </section>
+
+  <footer>
+    記録はこの端末のブラウザに保存されます（localStorage）。<br>
+    iPhoneで使う場合は同じブラウザ・同じ端末で保存データが残ります。必要に応じてCSVで退避してください。
+  </footer>
+
+  <script>
+    const LAT = 34.647;
+    const LON = 138.126;
+    const STORAGE_KEY = "omaezaki_net_operation_logs_v1";
+
+    let latestSnapshot = {
+      weather: "",
+      temp: null,
+      wind: null,
+      gust: null,
+      dir: "",
+      rawTime: ""
+    };
+
+    function degToDir(deg) {
+      const dirs = ["北", "北北東", "北東", "東北東", "東", "東南東", "南東", "南南東",
+                    "南", "南南西", "南西", "西南西", "西", "西北西", "北西", "北北西"];
+      return dirs[Math.round(deg / 22.5) % 16];
+    }
+
+    function weatherCodeToJa(code) {
+      const map = {
+        0: "晴",
+        1: "晴",
+        2: "一部曇",
+        3: "曇",
+        45: "霧",
+        48: "霧",
+        51: "弱雨",
+        53: "雨",
+        55: "強雨",
+        61: "小雨",
+        63: "雨",
+        65: "大雨",
+        71: "雪",
+        73: "雪",
+        75: "大雪",
+        80: "にわか雨",
+        81: "にわか雨",
+        82: "強いにわか雨",
+        95: "雷雨"
+      };
+      return map[code] ?? "不明";
+    }
+
+    function nowForInput() {
+      const now = new Date();
+      const tzOffset = now.getTimezoneOffset() * 60000;
+      return new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
+    }
+
+    function fillNow() {
+      document.getElementById("recordedAt").value = nowForInput();
+    }
+
+    function clearForm() {
+      fillNow();
+      document.getElementById("actionType").value = "上げ開始";
+      document.getElementById("riskLevel").value = "問題なし";
+      document.getElementById("feltWind").value = "弱い";
+      document.getElementById("manualWind").value = "";
+      document.getElementById("manualGust").value = "";
+      document.getElementById("memo").value = "";
+    }
+
+    function quickSetAction(action) {
+      document.getElementById("actionType").value = action;
+      fillNow();
+      document.getElementById("memo").focus();
+    }
+
+    function getRecords() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setRecords(records) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    async function loadCurrentWeather() {
+      try {
+        const url =
+          `https://api.open-meteo.com/v1/forecast` +
+          `?latitude=${LAT}&longitude=${LON}` +
+          `&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
+          `&timezone=Asia%2FTokyo` +
+          `&wind_speed_unit=ms`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const wind = data.current.wind_speed_10m;
+        const gust = data.current.wind_gusts_10m;
+        const dirDeg = data.current.wind_direction_10m;
+        const temp = data.current.temperature_2m;
+        const weatherText = weatherCodeToJa(data.current.weather_code);
+        const dir = degToDir(dirDeg);
+
+        latestSnapshot = {
+          weather: weatherText,
+          temp,
+          wind,
+          gust,
+          dir,
+          rawTime: data.current.time
+        };
+
+        document.getElementById("currentWind").textContent = wind.toFixed(1);
+        document.getElementById("currentGust").textContent = gust.toFixed(1);
+        document.getElementById("currentDir").textContent = dir;
+        document.getElementById("currentTemp").textContent = temp.toFixed(1);
+        document.getElementById("currentWeather").textContent = weatherText;
+      } catch (e) {
+        alert("現在値の取得に失敗しました");
+      }
+    }
+
+    function riskClass(level) {
+      if (level === "問題なし") return "ok";
+      if (level === "少し危険") return "warn";
+      return "bad";
+    }
+
+    function buildMemoBlock(record) {
+      const lines = [];
+      lines.push(`危険度：${record.riskLevel} / 体感風：${record.feltWind}`);
+
+      if (record.manualWind || record.manualGust) {
+        lines.push(`体感入力：風速 ${record.manualWind || "--"} m/s / 突風 ${record.manualGust || "--"} m/s`);
+      }
+
+      lines.push(
+        `予報参考：風速 ${record.snapshotWind ?? "--"} m/s / 突風 ${record.snapshotGust ?? "--"} m/s / 風向 ${record.snapshotDir || "--"} / 気温 ${record.snapshotTemp ?? "--"}℃ / ${record.snapshotWeather || "--"}`
+      );
+
+      if (record.memo) {
+        lines.push(`メモ：${record.memo}`);
+      }
+
+      return lines.join("\n");
+    }
+
+    function saveRecord() {
+      const recordedAt = document.getElementById("recordedAt").value;
+      const actionType = document.getElementById("actionType").value;
+      const riskLevel = document.getElementById("riskLevel").value;
+      const feltWind = document.getElementById("feltWind").value;
+      const manualWind = document.getElementById("manualWind").value;
+      const manualGust = document.getElementById("manualGust").value;
+      const memo = document.getElementById("memo").value.trim();
+
+      if (!recordedAt) {
+        alert("記録日時を入力してください");
+        return;
+      }
+
+      const records = getRecords();
+
+      const record = {
+        id: crypto.randomUUID(),
+        recordedAt,
+        actionType,
+        riskLevel,
+        feltWind,
+        manualWind,
+        manualGust,
+        memo,
+        snapshotWind: latestSnapshot.wind != null ? latestSnapshot.wind.toFixed(1) : "",
+        snapshotGust: latestSnapshot.gust != null ? latestSnapshot.gust.toFixed(1) : "",
+        snapshotDir: latestSnapshot.dir || "",
+        snapshotTemp: latestSnapshot.temp != null ? latestSnapshot.temp.toFixed(1) : "",
+        snapshotWeather: latestSnapshot.weather || "",
+        createdAt: new Date().toISOString()
+      };
+
+      records.unshift(record);
+      setRecords(records);
+      renderRecords();
+      clearForm();
+      alert("記録を保存しました");
+    }
+
+    function deleteRecord(id) {
+      if (!confirm("この記録を削除しますか？")) return;
+      const records = getRecords().filter(r => r.id !== id);
+      setRecords(records);
+      renderRecords();
+    }
+
+    function clearAllRecords() {
+      if (!confirm("すべての記録を削除しますか？")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      renderRecords();
+    }
+
+    function renderRecords() {
+      const list = document.getElementById("recordsList");
+      const records = getRecords();
+
+      if (!records.length) {
+        list.innerHTML = `<div class="empty">まだ記録はありません</div>`;
+        return;
+      }
+
+      list.innerHTML = records.map(record => `
+        <div class="record">
+          <div class="record-top">
+            <div>
+              <div class="record-title">${record.actionType}</div>
+              <div class="record-time">${formatDateTime(record.recordedAt)}</div>
+            </div>
+            <div>
+              <span class="tag ${riskClass(record.riskLevel)}">${record.riskLevel}</span>
+            </div>
+          </div>
+
+          <div class="record-meta">${escapeHtml(buildMemoBlock(record))}</div>
+
+          <div class="btn-row" style="margin-top:10px;">
+            <button class="secondary" onclick="copyRecord('${record.id}')">内容コピー</button>
+            <button class="danger" onclick="deleteRecord('${record.id}')">削除</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function copyRecord(id) {
+      const record = getRecords().find(r => r.id === id);
+      if (!record) return;
+
+      const text = [
+        `操作：${record.actionType}`,
+        `日時：${formatDateTime(record.recordedAt)}`,
+        `危険度：${record.riskLevel}`,
+        `体感風：${record.feltWind}`,
+        `体感入力：風速 ${record.manualWind || "--"} m/s / 突風 ${record.manualGust || "--"} m/s`,
+        `予報参考：風速 ${record.snapshotWind || "--"} m/s / 突風 ${record.snapshotGust || "--"} m/s / 風向 ${record.snapshotDir || "--"} / 気温 ${record.snapshotTemp || "--"}℃ / ${record.snapshotWeather || "--"}`,
+        `メモ：${record.memo || ""}`
+      ].join("\n");
+
+      navigator.clipboard.writeText(text)
+        .then(() => alert("記録内容をコピーしました"))
+        .catch(() => alert("コピーに失敗しました"));
+    }
+
+    function formatDateTime(value) {
+      const d = new Date(value);
+      return d.toLocaleString("ja-JP", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function exportCSV() {
+      const records = getRecords();
+
+      if (!records.length) {
+        alert("エクスポートする記録がありません");
+        return;
+      }
+
+      const headers = [
+        "recordedAt",
+        "actionType",
+        "riskLevel",
+        "feltWind",
+        "manualWind",
+        "manualGust",
+        "snapshotWind",
+        "snapshotGust",
+        "snapshotDir",
+        "snapshotTemp",
+        "snapshotWeather",
+        "memo"
+      ];
+
+      const escapeCSV = (value) => {
+        const s = String(value ?? "");
+        if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+        return s;
+      };
+
+      const lines = [
+        headers.join(","),
+        ...records.map(r => headers.map(h => escapeCSV(r[h])).join(","))
+      ];
+
+      const csv = lines.join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `net-operation-log-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+
+      URL.revokeObjectURL(url);
+    }
+
+    fillNow();
+    loadCurrentWeather();
+    renderRecords();
+  </script>
+</body>
+</html>
